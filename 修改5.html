@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>空境</title>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js">
+    </script>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://unpkg.com/lucide@latest">
+    </script>
+    <script src="https://unpkg.com/localforage@1.10.0/dist/localforage.min.js">
+    </script>
+    <script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js">
+    </script>
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        bg: 'var(--color-bg)', surface: 'var(--color-surface)',
+                        text: 'var(--color-text)', muted: 'var(--color-muted)',
+                        border: 'var(--color-border)', accent: 'var(--color-accent)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --color-bg: #f7f7f9;
+            --color-surface: #ffffff;
+            --color-text: #1a1a1a;
+            --color-muted: #888888;
+            --color-border: #e2e2e2;
+            --color-accent: #000000;
+        }
+        .dark {
+            --color-bg: #0d0d0f;
+            --color-surface: #171719;
+            --color-text: #e6e6e6;
+            --color-muted: #666666;
+            --color-border: #2a2a2a;
+            --color-accent: #ffffff;
+        }
+
+        body {
+            background-color: #d1d5db;
+            margin: 0;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .dark body {
+            background-color: #050505;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            background: var(--color-bg);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-image 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            .app-container {
+                width: 375px;
+                height: 812px;
+                border-radius: 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 0 0 8px #000;
+                border: 1px solid #333;
+            }
+        }
+
+        .msg-bubble {
+            display: inline-block !important;
+            padding: 8px 12px !important;
+            border-radius: 20px !important;
+            color: rgba(0, 0, 0, 0.85) !important;
+            position: relative !important;
+            background: rgba(255, 255, 255, 0.5) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            line-height: 1.45 !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+        .dark .msg-bubble {
+            color: rgba(255, 255, 255, 0.92) !important;
+            background: rgba(30, 30, 35, 0.55) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+        }
+        .highlight {
+            background-color: rgba(255, 208, 0, 0.5);
+            border-radius: 4px;
+            padding: 0 2px;
+        }
+
+        .view-enter-active,
+        .view-leave-active {
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .view-enter-from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        .view-leave-to {
+            transform: translateX(-20%);
+            opacity: 0;
+        }
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 1.2s ease;
+        }
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--color-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .intro-text {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 22px;
+            font-weight: 300;
+            letter-spacing: 0.4em;
+            opacity: 0;
+            animation: introReveal 3s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @keyframes introReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            25% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+        }
+
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface);
+            flex-shrink: 0;
+        }
+        .tab-bar button {
+            flex: 1;
+            padding: 10px 0;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: var(--color-muted);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-bar button.active {
+            color: var(--color-text);
+            border-bottom-color: var(--color-accent);
+        }
+
+        .library-section {
+            padding: 12px 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .inline-edit {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed var(--color-border);
+            font-size: inherit;
+            color: var(--color-text);
+            width: 100%;
+            padding: 2px 4px;
+        }
+        .inline-edit:focus {
+            outline: none;
+            border-bottom-color: var(--color-accent);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 8px;
+        }
+        .card-item {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 13px;
+            transition: all 0.2s;
+            cursor: default;
+            word-break: break-all;
+        }
+        .card-item .card-emoji {
+            font-size: 26px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .card-item .card-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--color-bg);
+        }
+
+        .drag-handle-group,
+        .drag-handle-reply,
+        .drag-handle-emoji {
+            cursor: grab;
+        }
+        .drag-handle-group:active,
+        .drag-handle-reply:active,
+        .drag-handle-emoji:active {
+            cursor: grabbing;
+        }
+        .reply-item {
+            transition: background 0.1s ease;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 999;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .range-slider {
+            position: relative;
+            height: 6px;
+            background: var(--color-border);
+            border-radius: 3px;
+            margin: 12px 0;
+        }
+        .range-slider .track {
+            position: absolute;
+            height: 6px;
+            background: var(--color-accent);
+            border-radius: 3px;
+            opacity: 0.4;
+        }
+        .range-slider input[type="range"] {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--color-text);
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid var(--color-surface);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        }
+        .range-slider input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--color-text);
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid var(--color-surface);
+        }
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--color-muted);
+            margin-top: 4px;
+        }
+
+        .no-cursor {
+            caret-color: transparent;
+        }
+        .no-cursor::after {
+            display: none !important;
+        }
+
+        /* 分组折叠 */
+        .group-collapse-toggle {
+            transition: transform 0.3s ease;
+        }
+        .group-collapse-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+        .group-replies-container {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .group-replies-container.collapsed {
+            max-height: 0 !important;
+        }
+
+        /* 表情选择器弹窗 */
+        .emoji-picker-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .emoji-picker-panel {
+            background: var(--color-surface);
+            border-radius: 20px 20px 0 0;
+            padding: 16px 16px 30px;
+            width: 100%;
+            max-width: 375px;
+            max-height: 60vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .emoji-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 6px;
+        }
+        .emoji-picker-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            border-radius: 12px;
+            background: var(--color-bg);
+            border: 1px solid transparent;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+        .emoji-picker-item:active {
+            transform: scale(0.92);
+            background: var(--color-border);
+        }
+        .emoji-picker-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .emoji-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 12px;
+        }
+        .emoji-picker-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        .emoji-picker-tabs button {
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            background: transparent;
+            color: var(--color-muted);
+        }
+        .emoji-picker-tabs button.active {
+            background: var(--color-accent);
+            color: var(--color-surface);
+            border-color: var(--color-accent);
+        }
+    </style>
+    <style id="custom-css-injection"></style>
+</head>
+<body class="flex justify-center items-center h-screen w-screen transition-colors duration-300">
+
+    <div id="app" v-cloak>
+        <div v-if="toastMessage" class="toast" :class="{'opacity-0': !toastVisible}" v-text="toastMessage"></div>
+
+        <!-- 表情选择器 -->
+        <div v-if="showEmojiPicker" class="emoji-picker-overlay" @click.self="closeEmojiPicker">
+            <div class="emoji-picker-panel">
+                <div class="emoji-picker-header">
+                    <span class="text-sm font-medium text-text">选择表情</span>
+                    <button @click="closeEmojiPicker" class="text-muted hover:text-text p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="emoji-picker-tabs mb-3">
+                    <button :class="{ active: emojiPickerTab === 'emoji' }" @click="emojiPickerTab = 'emoji'">Emoji</button>
+                    <button :class="{ active: emojiPickerTab === 'image' }" @click="emojiPickerTab = 'image'">图片</button>
+                </div>
+                <div class="emoji-picker-grid">
+                    <template v-if="emojiPickerTab === 'emoji'">
+                        <div v-for="e in emojiLib.filter(item => item.type === 'emoji')" :key="e.id" class="emoji-picker-item" @click="insertEmojiToInput(e)">
+                            {{ e.emoji }}
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div v-for="e in emojiLib.filter(item => item.type === 'image')" :key="e.id" class="emoji-picker-item" @click="insertEmojiToInput(e)">
+                            <img :src="e.data" alt="表情">
+                        </div>
+                    </template>
+                </div>
+                <div class="text-center text-xs text-muted/50 mt-3 pt-2 border-t border-border">点击表情直接添加到输入框</div>
+            </div>
+        </div>
+
+        <transition name="fade">
+            <div v-if="showIntro" class="intro-overlay text-text">
+                <div class="intro-text">见字如面</div>
+            </div>
+        </transition>
+
+        <div class="app-container text-sm" :style="appBgStyle">
+            <transition name="view">
+                <!-- 主屏幕 -->
+                <div v-if="currentView === 'home'" key="home" class="absolute inset-0 flex flex-col pt-24 px-8 z-10 bg-bg">
+                    <div class="mb-14">
+                        <h1 class="text-4xl serif-text tracking-widest mb-2 font-semibold text-text">留白</h1>
+                        <p class="text-[10px] text-muted tracking-widest font-light">境随心转 · 万物生辉</p>
+                    </div>
+                    <div class="grid grid-cols-4 gap-6 mt-6">
+                        <div class="flex flex-col items-center gap-2 group cursor-pointer" @click="switchView('chat')">
+                            <div class="w-14 h-14 bg-accent text-bg rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 relative">
+                                <i data-lucide="feather" class="w-6 h-6 stroke-[1.5]"></i>
+                                <div v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-bg">{{ unreadCount }}</div>
+                            </div>
+                            <span class="text-[11px] font-light tracking-widest">交谈</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 group cursor-pointer" @click="switchView('library')">
+                            <div class="w-14 h-14 bg-surface border border-border text-text rounded-2xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
+                                <i data-lucide="library" class="w-6 h-6 stroke-[1.5]"></i>
+                            </div>
+                            <span class="text-[11px] font-light tracking-widest">语料</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 group cursor-pointer" @click="switchView('insight')">
+                            <div class="w-14 h-14 bg-surface border border-border text-text rounded-2xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
+                                <i data-lucide="pie-chart" class="w-6 h-6 stroke-[1.5]"></i>
+                            </div>
+                            <span class="text-[11px] font-light tracking-widest">洞察</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 group cursor-pointer" @click="switchView('settings')">
+                            <div class="w-14 h-14 bg-surface border border-border text-text rounded-2xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
+                                <i data-lucide="sliders-horizontal" class="w-6 h-6 stroke-[1.5]"></i>
+                            </div>
+                            <span class="text-[11px] font-light tracking-widest">偏好</span>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center text-[10px] text-muted/50 tracking-widest" v-if="settings.notificationPermission === 'granted'">
+                        通知已开启
+                    </div>
+                </div>
+
+                <!-- 交谈视图 -->
+                <div v-else-if="currentView === 'chat'" key="chat" class="absolute inset-0 flex flex-col z-20">
+                    <header class="h-14 flex items-center justify-between px-3 border-b border-border/40 shrink-0 bg-surface/60 backdrop-blur-md">
+                        <div class="flex items-center gap-2">
+                            <button @click="switchView('home')" class="p-2 -ml-1 text-text hover:opacity-60"><i data-lucide="chevron-left" class="w-5 h-5 stroke-[1.5]"></i></button>
+                            <div class="flex items-center gap-2 group cursor-pointer">
+                                <div v-if="settings.showAvatar" @click.stop="editAvatar('them')" class="w-8 h-8 bg-surface border border-border/50 flex items-center justify-center overflow-hidden shadow-sm" :style="{ borderRadius: settings.avatarRadius + '%' }">
+                                    <img v-if="profiles.them.avatar" :src="profiles.them.avatar" class="w-full h-full object-cover">
+                                    <span v-else class="text-xs text-muted serif-text">{{ profiles.them.name.charAt(0) }}</span>
+                                </div>
+                                <div class="flex flex-col" @click.stop="editName('them')">
+                                    <span class="text-[14px] font-medium tracking-widest hover:underline underline-offset-4">{{ profiles.them.name }}</span>
+                                    <span v-if="isTyping" class="text-[9px] text-muted tracking-widest absolute top-10">落笔中...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button @click="toggleSearch" class="p-2 text-muted hover:text-text"><i data-lucide="search" class="w-4 h-4 stroke-[1.5]"></i></button>
+                            <button @click="captureScreenshot" class="p-2 text-muted hover:text-text"><i data-lucide="camera" class="w-4 h-4 stroke-[1.5]"></i></button>
+                        </div>
+                    </header>
+
+                    <div v-if="chatState.isSearching" class="bg-surface/90 backdrop-blur px-4 py-2 flex items-center gap-2 border-b border-border/40 text-xs shrink-0 z-10">
+                        <i data-lucide="search" class="w-3 h-3 text-muted"></i>
+                        <input v-model="chatState.keyword" type="text" placeholder="寻觅留白..." class="flex-1 bg-transparent font-light" @input="executeSearch">
+                        <span v-if="chatState.results.length" class="text-muted text-[10px]">{{ chatState.currentIdx + 1 }}/{{ chatState.results.length }}</span>
+                        <button @click="jumpSearch(-1)" class="p-1 text-text disabled:opacity-30" :disabled="!chatState.results.length"><i data-lucide="chevron-up" class="w-3 h-3"></i></button>
+                        <button @click="jumpSearch(1)" class="p-1 text-text disabled:opacity-30" :disabled="!chatState.results.length"><i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+                        <button @click="toggleSearch" class="p-1 text-red-400"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    </div>
+
+                    <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-6 pb-24 scroll-smooth">
+                        <div id="capture-area" class="pb-10">
+                            <div v-for="(msg, index) in messages" :key="msg.id" :id="'msg-'+msg.id" class="mb-5 relative group flex" :class="msg.sender === 'me' ? 'justify-end' : 'justify-start'">
+                                <div class="flex max-w-[85%] gap-2" :class="msg.sender === 'me' ? 'flex-row-reverse' : 'flex-row'">
+                                    <div v-if="settings.showAvatar" class="shrink-0 w-7 h-7 mt-1 cursor-pointer" :class="{'opacity-0': !shouldShowAvatar(index)}" @click="editAvatar(msg.sender)">
+                                        <div class="w-full h-full bg-surface border border-border/50 flex items-center justify-center overflow-hidden" :style="{ borderRadius: settings.avatarRadius + '%' }">
+                                            <img v-if="profiles[msg.sender].avatar" :src="profiles[msg.sender].avatar" class="w-full h-full object-cover">
+                                            <span v-else class="text-[10px] text-muted serif-text">{{ profiles[msg.sender].name.charAt(0) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col relative" :class="msg.sender === 'me' ? 'items-end' : 'items-start'">
+                                        <button @click="deleteMsg(msg.id)" class="absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted hover:text-red-500 p-1 bg-surface/70 rounded-full shadow-sm backdrop-blur" :class="msg.sender === 'me' ? '-left-7' : '-right-7'">
+                                            <i data-lucide="trash-2" class="w-3 h-3 stroke-[1.5]"></i>
+                                        </button>
+                                        <div class="msg-bubble custom-css-target no-cursor" :class="settings.fontFamily === 'serif' ? 'serif-text' : 'sans-text'" :style="{ fontSize: settings.fontSize + 'px' }" v-html="formatMessageContent(msg.content)"></div>
+                                        <div class="flex items-center gap-2 mt-1 px-1">
+                                            <span class="text-[9px] tracking-wider text-muted/80 bg-surface/30 px-1 rounded">{{ formatTime(msg.timestamp) }}</span>
+                                            <span v-if="msg.sender === 'me'" class="text-[9px] tracking-widest bg-surface/30 px-1 rounded" :class="msg.status === 'read' ? 'text-text' : 'text-muted'">{{ msg.status === 'read' ? '已读' : '未读' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="messages.length === 0" class="mt-32 flex flex-col items-center justify-center opacity-30 text-muted">
+                                <span class="text-xs font-light tracking-widest serif-text">此处尚无回音</span>
+                            </div>
+                        </div>
+                    </main>
+
+                    <footer class="absolute bottom-0 left-0 right-0 p-3 bg-surface/70 backdrop-blur-xl border-t border-border/30 shrink-0">
+                        <div class="flex items-end gap-2 bg-surface/80 border border-border/60 rounded-2xl px-3 py-1.5 focus-within:border-muted transition-colors shadow-sm">
+                            <button @click="forceReply" :disabled="isTyping" class="p-2 -ml-1 text-muted hover:text-text disabled:opacity-30"><i data-lucide="radio" class="w-5 h-5 stroke-[1.5]"></i></button>
+                            <button @click="openEmojiPicker" class="p-2 text-muted hover:text-text"><i data-lucide="smile" class="w-5 h-5 stroke-[1.5]"></i></button>
+                            <textarea v-model="inputText" @keydown.enter.prevent="handleSend" @input="saveDraft" rows="1" class="flex-1 py-2 text-[14px] resize-none max-h-24 font-light tracking-wide placeholder:text-muted/60 leading-relaxed bg-transparent" placeholder="书写..."></textarea>
+                            <button @click="handleSend" class="p-2 -mr-1 text-text hover:opacity-50 transition-opacity shrink-0"><i data-lucide="arrow-up" class="w-5 h-5 stroke-[2]"></i></button>
+                        </div>
+                    </footer>
+                </div>
+
+                <!-- 语料库 -->
+                <div v-else-if="currentView === 'library'" key="library" class="absolute inset-0 flex flex-col z-20 bg-bg">
+                    <header class="h-14 flex items-center justify-between px-4 border-b border-border shrink-0 bg-surface">
+                        <button @click="switchView('home')" class="p-2 -ml-2 text-text hover:opacity-60"><i data-lucide="chevron-left" class="w-5 h-5 stroke-[1.5]"></i></button>
+                        <span class="text-[13px] font-medium tracking-widest serif-text"></span>
+                        <div class="flex gap-1">
+                            <button @click="exportFullLibrary" class="p-2 text-muted hover:text-text"><i data-lucide="download" class="w-4 h-4 stroke-[1.5]"></i></button>
+                            <label class="p-2 text-muted hover:text-text cursor-pointer"><i data-lucide="upload" class="w-4 h-4 stroke-[1.5]"></i><input type="file" accept=".json" class="hidden" @change="importFullLibrary"></label>
+                        </div>
+                    </header>
+
+                    <div class="tab-bar">
+                        <button :class="{ active: libTab === 'reply' }" @click="libTab = 'reply'">语料</button>
+                        <button :class="{ active: libTab === 'emoji' }" @click="libTab = 'emoji'">表情包</button>
+                    </div>
+
+                    <!-- 语料 (可折叠分组) -->
+                    <div v-show="libTab === 'reply'" class="library-section">
+                        <div class="flex items-center gap-2 mb-3 text-xs flex-wrap">
+                            <div class="flex-1 relative min-w-[120px]">
+                                <i data-lucide="search" class="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-muted"></i>
+                                <input v-model="libSearchQuery" placeholder="筛选语料..." class="w-full bg-bg rounded-md py-1.5 pl-7 pr-2 font-light border border-transparent focus:border-border text-xs">
+                            </div>
+                            <button v-if="selectedRepliesArr.length" @click="batchDelete" class="text-red-500 hover:underline text-[11px]">剔除({{ selectedRepliesArr.length }})</button>
+                            <button v-if="selectedRepliesArr.length" @click="batchToggle" class="text-text hover:underline text-[11px]">启/禁</button>
+                            <button @click="triggerImport" class="text-accent hover:underline text-[11px] font-medium">导入语料</button>
+                            <button @click="toggleAllGroups" class="text-accent hover:underline text-[11px] font-medium">{{ allGroupsExpanded ? '全部收起' : '全部展开' }}</button>
+                        </div>
+
+                        <div class="space-y-3" id="library-groups">
+                            <div v-for="group in filteredGroups" :key="group.id" class="group-item relative" :data-id="group.id">
+                                <div class="flex items-center justify-between mb-1 p-2 bg-surface/50 rounded-xl border border-border/50">
+                                    <div class="flex items-center gap-1 flex-1">
+                                        <div class="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted hover:text-text drag-handle-group"><i data-lucide="grip-vertical" class="w-4 h-4"></i></div>
+                                        <button @click="toggleGroupCollapse(group.id)" class="p-1 text-muted hover:text-text transition-transform" :class="{'rotate-90': !groupCollapsed[group.id]}">
+                                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                        </button>
+                                        <input v-model="group.name" @blur="debouncedSave" class="font-medium text-[13px] tracking-widest w-32 border-b border-transparent hover:border-border focus:border-text bg-transparent px-1">
+                                        <span class="text-[10px] text-muted/60 ml-1">({{ group.replies.length }})</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <button @click="addReplyToGroup(group.id)" class="text-muted hover:text-text text-[11px] flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> 添加</button>
+                                        <button @click="deleteGroup(group.id)" class="text-muted hover:text-red-500"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                                <div class="group-replies-container" :class="{ collapsed: groupCollapsed[group.id] }" :style="{ maxHeight: groupCollapsed[group.id] ? '0' : '2000px' }">
+                                    <div class="bg-surface border border-border rounded-xl overflow-hidden reply-list mt-1" :data-group-id="group.id">
+                                        <div v-if="!group.replies.length" class="p-3 text-center text-xs text-muted/50 font-light">空寂无声</div>
+                                        <div v-for="reply in group.replies" :key="reply.id" class="reply-item flex items-center gap-2 p-2.5 border-b border-border/50 last:border-0 group/reply" :data-id="reply.id" :class="{'bg-bg/40': !reply.enabled}">
+                                            <i data-lucide="grip-horizontal" class="w-3.5 h-3.5 text-muted drag-handle-reply cursor-grab shrink-0 opacity-60 hover:opacity-100"></i>
+                                            <input type="checkbox" :value="reply.id" v-model="selectedRepliesArr" class="accent-text shrink-0">
+                                            <input v-model="reply.text" @blur="debouncedSave" class="flex-1 text-[12px] font-light bg-transparent" :class="{'text-muted line-through decoration-muted/40': !reply.enabled}" placeholder="留白一句">
+                                            <button @click="toggleReplyEnable(reply)" class="w-8 h-4 rounded-full relative transition-colors duration-200 shrink-0" :class="reply.enabled ? 'bg-text' : 'bg-border'">
+                                                <div class="absolute top-0.5 left-0.5 w-3 h-3 bg-surface rounded-full transition-transform duration-200" :class="reply.enabled ? 'translate-x-4' : 'translate-x-0'"></div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button @click="addGroup" class="w-full py-3 border border-dashed border-border rounded-xl text-xs text-muted hover:text-text hover:border-muted transition-colors flex items-center justify-center gap-2 font-light tracking-widest mt-2">
+                                <i data-lucide="folder-plus" class="w-4 h-4 stroke-[1.5]"></i> 新辟卷宗
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 表情包 -->
+                    <div v-show="libTab === 'emoji'" class="library-section">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs text-muted tracking-widest">表情包 · 可拖拽排序</span>
+                            <label class="text-xs text-text flex items-center gap-1 cursor-pointer hover:opacity-70">
+                                <i data-lucide="images" class="w-3 h-3"></i> 选择照片
+                                <input type="file" accept="image/*" multiple class="hidden" @change="addImageEmojis">
+                            </label>
+                        </div>
+                        <div id="emoji-list" class="card-grid">
+                            <div v-for="(emoji, idx) in emojiLib" :key="emoji.id" class="card-item relative group/emoji" :data-id="emoji.id">
+                                <div class="absolute -top-1 -right-1 opacity-0 group-hover/emoji:opacity-100 transition-opacity">
+                                    <button @click="deleteEmoji(emoji.id)" class="w-4 h-4 bg-surface rounded-full border border-border text-red-400 flex items-center justify-center"><i data-lucide="x" class="w-2.5 h-2.5"></i></button>
+                                </div>
+                                <div class="drag-handle-emoji cursor-grab active:cursor-grabbing p-1 rounded-full hover:bg-bg inline-block">
+                                    <i data-lucide="grip-horizontal" class="w-3 h-3 text-muted"></i>
+                                </div>
+                                <div class="mt-1">
+                                    <div v-if="emoji.type === 'image' && emoji.data">
+                                        <img :src="emoji.data" class="card-image" alt="表情">
+                                    </div>
+                                    <div v-else class="text-2xl">{{ emoji.emoji || '😊' }}</div>
+                                </div>
+                            </div>
+                            <div class="card-item border-dashed flex items-center justify-center text-muted/50 text-xs cursor-pointer hover:bg-surface/50" @click="addEmojiItem">
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                                <span class="text-[9px] mt-1">添加Emoji</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 洞察 -->
+                <div v-else-if="currentView === 'insight'" key="insight" class="absolute inset-0 flex flex-col z-20 bg-bg">
+                    <header class="h-14 flex items-center justify-between px-4 border-b border-border shrink-0 bg-surface">
+                        <button @click="switchView('home')" class="p-2 -ml-2 text-text"><i data-lucide="chevron-left" class="w-5 h-5 stroke-[1.5]"></i></button>
+                        <span class="text-[13px] font-medium tracking-widest serif-text">记忆洞察</span>
+                        <div class="w-9"></div>
+                    </header>
+                    <main class="flex-1 overflow-y-auto p-6 space-y-8 font-light text-[13px]">
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div class="bg-surface p-4 rounded-xl border border-border"><div class="text-xs text-muted mb-1 tracking-widest">只言片语</div><div class="text-2xl font-serif text-text">{{ messages.length }}</div></div>
+                            <div class="bg-surface p-4 rounded-xl border border-border"><div class="text-xs text-muted mb-1 tracking-widest">初次相遇</div><div class="text-[11px] font-serif text-text mt-2">{{ statData.firstTime }}</div></div>
+                        </div>
+                        <div class="bg-surface p-5 rounded-xl border border-border space-y-4"><div class="text-[11px] tracking-widest text-muted uppercase">言语占比</div><div class="flex h-2 rounded-full overflow-hidden bg-bg"><div class="bg-text transition-all" :style="{ width: statData.myRatio + '%' }"></div><div class="bg-muted transition-all" :style="{ width: (100 - statData.myRatio) + '%' }"></div></div><div class="flex justify-between text-[10px] text-muted"><span>我: {{ statData.myRatio }}%</span><span>客: {{ 100 - statData.myRatio }}%</span></div></div>
+                        <div class="bg-surface p-5 rounded-xl border border-border"><div class="text-[11px] tracking-widest text-muted uppercase mb-4">思绪浮现</div><div class="flex flex-wrap gap-2"><span v-for="(word, i) in statData.hotWords" :key="i" class="px-2 py-1 bg-bg border border-border rounded text-[11px]" :class="i < 3 ? 'text-text font-medium' : 'text-muted'">{{ word.text }} ({{ word.count }})</span><span v-if="!statData.hotWords.length" class="text-xs text-muted/50">尚无成形之语</span></div></div>
+                    </main>
+                </div>
+
+                <!-- 偏好设置 -->
+                <div v-else-if="currentView === 'settings'" key="settings" class="absolute inset-0 flex flex-col z-20 bg-bg">
+                    <header class="h-14 flex items-center justify-between px-4 border-b border-border shrink-0 bg-surface">
+                        <button @click="switchView('home')" class="p-2 -ml-2 text-text"><i data-lucide="chevron-left" class="w-5 h-5 stroke-[1.5]"></i></button>
+                        <span class="text-[13px] font-medium tracking-widest serif-text">法则</span>
+                        <div class="w-9"></div>
+                    </header>
+                    <main class="flex-1 overflow-y-auto p-4 space-y-6 pb-12">
+                        <section><h3 class="text-[11px] font-semibold text-muted tracking-widest px-2 mb-2">陈列馆</h3>
+                            <div class="bg-surface border border-border rounded-xl p-3 flex gap-3 overflow-x-auto snap-x"><label class="w-16 h-24 shrink-0 border border-dashed border-border rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-bg"><i data-lucide="plus" class="w-4 h-4 text-muted"></i><span class="text-[9px] text-muted">添置</span><input type="file" accept="image/*" class="hidden" @change="uploadBgToLibrary"></label><div class="w-16 h-24 shrink-0 border rounded-md cursor-pointer flex items-center justify-center text-[10px] text-muted snap-center transition-all" :class="!settings.bgImage ? 'border-text bg-bg' : 'border-border bg-surface'" @click="setBg('')">无相</div><div v-for="(bg, idx) in settings.bgLibrary" :key="idx" class="w-16 h-24 shrink-0 rounded-md bg-cover bg-center cursor-pointer relative group snap-center" :style="{ backgroundImage: `url(${bg})` }" :class="settings.bgImage === bg ? 'ring-2 ring-text ring-offset-1' : ''" @click="setBg(bg)"><button @click.stop="removeBg(idx)" class="absolute -top-2 -right-2 w-5 h-5 bg-surface text-red-500 rounded-full shadow border border-border opacity-0 group-hover:opacity-100 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3"></i></button></div></div></section>
+
+                        <section><h3 class="text-[11px] font-semibold text-muted tracking-widest px-2 mb-2">排版</h3><div class="bg-surface border border-border rounded-xl overflow-hidden text-[13px]"><div class="flex items-center justify-between p-3.5 border-b border-border"><span>墨色模式</span><button @click="toggleDarkMode" class="w-10 h-5 rounded-full relative transition-colors" :class="settings.darkMode ? 'bg-text' : 'bg-border'"><div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.darkMode ? 'translate-x-5' : 'translate-x-0'"></div></button></div><div class="flex items-center justify-between p-3.5 border-b border-border"><span>形体</span><select v-model="settings.fontFamily" class="bg-bg border border-border rounded px-2 py-1 text-xs"><option value="sans">无衬线</option><option value="serif">衬线</option></select></div><div class="p-3.5 border-b border-border flex flex-col gap-3"><div class="flex justify-between"><span>字重尺寸</span><span>{{settings.fontSize}}px</span></div><input type="range" v-model.number="settings.fontSize" min="12" max="20" class="w-full accent-text"></div><div class="flex items-center justify-between p-3.5 border-b border-border"><span>显露头像</span><button @click="settings.showAvatar = !settings.showAvatar" class="w-10 h-5 rounded-full relative transition-colors" :class="settings.showAvatar ? 'bg-text' : 'bg-border'"><div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.showAvatar ? 'translate-x-5' : 'translate-x-0'"></div></button></div><div class="p-3.5 flex flex-col gap-2"><span>气泡刺绣 (CSS)</span><textarea v-model="settings.customCSS" rows="2" class="w-full bg-bg border border-border rounded p-2 text-[10px] font-mono resize-none" placeholder=".custom-css-target { }"></textarea></div></div></section>
+
+                        <section><h3 class="text-[11px] font-semibold text-muted tracking-widest px-2 mb-2">交互</h3>
+                            <div class="bg-surface border border-border rounded-xl overflow-hidden">
+                                <div class="flex items-center justify-between p-3.5 border-b border-border">
+                                    <span>空灵回声 <span class="text-[9px] text-muted">(消息提示音)</span></span>
+                                    <div class="flex items-center gap-3">
+                                        <select v-model="settings.soundType" class="bg-bg border border-border rounded px-2 py-1 text-xs w-24">
+                                            <option value="note">三全音</option>
+                                            <option value="chime">钟声</option>
+                                            <option value="glass">玻璃</option>
+                                            <option value="bamboo">竹音</option>
+                                            <option value="soft">柔和</option>
+                                        </select>
+                                        <button @click="toggleSound" class="w-10 h-5 rounded-full relative transition-colors" :class="settings.soundEnabled ? 'bg-text' : 'bg-border'">
+                                            <div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.soundEnabled ? 'translate-x-5' : 'translate-x-0'"></div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-3.5 border-b border-border"><div class="flex justify-between text-[12px]"><span>徐徐道来 <span class="text-[10px] text-muted">(回复速度)</span></span><span>{{ settings.replyMin }}s ~ {{ settings.replyMax }}s</span></div>
+                                    <div class="range-slider">
+                                        <div class="track" :style="{ left: ((settings.replyMin - 10) / (1790) * 100) + '%', right: ((1800 - settings.replyMax) / (1790) * 100) + '%' }"></div>
+                                        <input type="range" min="10" max="1800" step="1" v-model.number="settings.replyMin" @input="onReplyRangeChange">
+                                        <input type="range" min="10" max="1800" step="1" v-model.number="settings.replyMax" @input="onReplyRangeChange">
+                                    </div>
+                                    <div class="range-labels"><span>10s</span><span>1800s</span></div>
+                                </div>
+
+                                <div class="flex items-center justify-between p-3.5 border-b border-border"><span>语料随缘抛出 <span class="text-[10px] text-muted">(自动回复)</span></span><button @click="settings.autoReply = !settings.autoReply" class="w-10 h-5 rounded-full relative" :class="settings.autoReply ? 'bg-text' : 'bg-border'"><div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.autoReply ? 'translate-x-5' : 'translate-x-0'"></div></button></div>
+
+                                <div class="flex items-center justify-between p-3.5 border-b border-border"><span>静候主动搭话 <span class="text-[10px] text-muted">(主动消息)</span></span><button @click="settings.activeMessage = !settings.activeMessage" class="w-10 h-5 rounded-full relative" :class="settings.activeMessage ? 'bg-text' : 'bg-border'"><div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.activeMessage ? 'translate-x-5' : 'translate-x-0'"></div></button></div>
+                                <div v-if="settings.activeMessage" class="p-3.5 bg-bg/50 flex flex-col gap-2"><div class="flex justify-between text-[11px] text-muted"><span>忍耐间隙</span><span>{{settings.activeInterval}}s <span class="text-[10px]">(最长10小时)</span></span></div><input type="range" v-model.number="settings.activeInterval" min="10" max="36000" step="10" class="w-full accent-text"></div>
+
+                                <div class="flex items-center justify-between p-3.5"><span>后台消息通知 <span class="text-[10px] text-muted">(浏览器通知)</span></span><button @click="requestNotification" class="text-xs text-accent hover:underline">{{ settings.notificationPermission === 'granted' ? '已开启' : '请求权限' }}</button></div>
+                            </div>
+                        </section>
+
+                        <div class="mt-4"><button @click="clearChat" class="w-full text-left p-4 bg-surface border border-border rounded-xl text-red-500 font-light tracking-wider hover:bg-red-500/5 transition-colors flex justify-between items-center">焚毁旧梦 <i data-lucide="flame" class="w-4 h-4"></i></button></div>
+                    </main>
+                </div>
+            </transition>
+        </div>
+    </div>
+
+    <script>
+        const {
+            createApp,
+            ref,
+            reactive,
+            computed,
+            watch,
+            nextTick,
+            onMounted,
+            onUnmounted
+        } = Vue;
+        const genId = () => Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6);
+
+        // 预设表情
+        const PRESET_EMOJIS = [
+            '😀', '😃', '😄', '😁', '😆', '🥹', '😅', '😂', '🤣', '🥲',
+            '😇', '🙂', '🙃', '😉', '😌', '😍', '😘', '😗', '😙', '😚',
+            '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸',
+            '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️',
+            '😣', '😖', '😫', '😩', '😢', '😭', '😤', '😠', '😡', '🤬',
+            '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗',
+            '🤔', '🫣', '🤭', '🫢', '🫡', '🤫', '🫠', '🤥', '😶', '🫥',
+            '😐', '🫤', '😑', '🫨', '😬', '🙄', '😯', '😦', '😧', '😮',
+            '😲', '🥱', '😴', '🤤', '😪', '😮‍💨', '😵', '😵‍💫', '🤐', '🥴',
+            '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿',
+            '🤡', '💩', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀',
+            '😿', '😾', '🫶', '🤲', '👏', '👐', '🙌', '🤝', '👍', '👎',
+            '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🫰', '🤟', '🤘', '👌',
+            '🤌', '🤏', '🫳', '🫴', '👈', '👉', '👆', '👇', '☝️', '✋',
+            '🤚', '🖐️', '🖖', '👋', '🤙', '💪', '✍️', '🙏', '🫵', '👂',
+            '👀', '🫂', '🕶️', '🌂', '💍', '🐱', '🐭', '🐹', '🦊', '🐶',
+            '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧',
+            '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🐴', '🦄', '🐝',
+            '🐞', '🦋', '🐙', '🦑', '🐬', '🐳', '🐋', '🦈', '🐊', '🦕',
+            '🦖', '🐉', '🌺', '🌸', '🌷', '🌹', '🌻', '🌼', '💐', '🌿',
+            '☘️', '🍀', '🎍', '💮', '🪷', '🌊', '⛅', '🌈', '☀️', '🌙',
+            '⭐', '🌟', '✨', '🔥', '💧', '❄️', '☁️'
+        ];
+
+        // 自动分类规则
+        const CATEGORY_RULES = [
+            { keywords: ['老婆', '老公', '夫人', '妻子', '亲爱的', '宝贝', '宝宝', '小猫', '乖', '小乖', '笨猫'], category: '称呼类' },
+            { keywords: ['好', '不好', '想', '不想', '要', '不要', '喜欢', '爱', '讨厌', '开心', '难过', '生气', '委屈', '吃醋',
+                    '幸福', '伤心', '可爱', '漂亮', '美'
+                ], category: '情感类' },
+            { keywords: ['什么', '怎么', '为什么', '吗', '呢', '吧', '呀', '是不是', '有没有', '可以吗', '好吗', '会吗', '对不对'],
+                category: '询问类' },
+            { keywords: ['吃饭', '睡觉', '洗澡', '出门', '回家', '工作', '学习', '游戏', '看书', '听歌', '运动', '忙', '累',
+                    '困', '饿'
+                ], category: '日常类' },
+            { keywords: ['谢谢', '对不起', '抱歉', '没关系', '辛苦了', '爱你', '亲亲', '抱抱', '摸摸', '揉揉', '捏捏', '蹭蹭',
+                    '贴贴'
+                ], category: '互动类' },
+            { keywords: ['行', '好', '嗯', '哦', '啊', '唉', '哟', '哦哦', '嗯嗯', '嘿嘿', '哈哈', '嘻嘻', '么么', '啾啾',
+                    'mua'
+                ], category: '语气词' }
+        ];
+
+        function autoCategorize(text) {
+            for (const rule of CATEGORY_RULES) {
+                for (const kw of rule.keywords) {
+                    if (text.includes(kw)) return rule.category;
+                }
+            }
+            return '其他';
+        }
+
+        // 音效生成
+        function generateSound(type) {
+            try {
+                const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0.3, now);
+
+                switch (type) {
+                    case 'note':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, now);
+                        osc.frequency.exponentialRampToValueAtTime(660, now + 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                        osc.start(now);
+                        osc.stop(now + 0.15);
+                        break;
+                    case 'chime':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1200, now);
+                        osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                        osc.start(now);
+                        osc.stop(now + 0.25);
+                        break;
+                    case 'glass':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1400, now);
+                        osc.frequency.exponentialRampToValueAtTime(1000, now + 0.08);
+                        gain.gain.setValueAtTime(0.15, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                        osc.start(now);
+                        osc.stop(now + 0.12);
+                        break;
+                    case 'bamboo':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(600, now);
+                        osc.frequency.exponentialRampToValueAtTime(900, now + 0.06);
+                        gain.gain.setValueAtTime(0.2, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                        osc.start(now);
+                        osc.stop(now + 0.1);
+                        break;
+                    default:
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(520, now);
+                        osc.frequency.exponentialRampToValueAtTime(380, now + 0.12);
+                        gain.gain.setValueAtTime(0.25, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                        osc.start(now);
+                        osc.stop(now + 0.18);
+                        break;
+                }
+            } catch (e) {}
+        }
+
+        createApp({
+            setup() {
+                const showIntro = ref(true);
+                const currentView = ref('home');
+                const unreadCount = ref(0);
+                const messages = ref([]);
+                const inputText = ref('');
+                const isTyping = ref(false);
+                const toastMessage = ref('');
+                const toastVisible = ref(false);
+                const showEmojiPicker = ref(false);
+                const emojiPickerTab = ref('emoji');
+                let activeTimer = null;
+                let replyTimer = null;
+                let toastTimer = null;
+                let audioCtx = null;
+
+                const profiles = reactive({ me: { name: '我', avatar: '' }, them: { name: '客', avatar: '' } });
+                const settings = reactive({
+                    darkMode: false,
+                    showAvatar: true,
+                    avatarRadius: 50,
+                    autoReply: true,
+                    activeMessage: false,
+                    activeInterval: 60,
+                    soundEnabled: true,
+                    soundType: 'note',
+                    typewriter: true,
+                    bgImage: '',
+                    bgLibrary: [],
+                    fontFamily: 'serif',
+                    fontSize: 14,
+                    customCSS: '',
+                    replyMin: 30,
+                    replyMax: 120,
+                    notificationPermission: 'default'
+                });
+
+                const replyGroups = ref([]);
+                const libSearchQuery = ref('');
+                const selectedRepliesArr = ref([]);
+                const emojiLib = ref([]);
+                const libTab = ref('reply');
+
+                // 折叠状态
+                const groupCollapsed = reactive({});
+                const allGroupsExpanded = ref(true);
+
+                const chatState = reactive({ isSearching: false, keyword: '', results: [], currentIdx: 0 });
+                let saveTimer = null;
+                let groupSortable = null;
+                let replySortables = [];
+                let emojiSortable = null;
+
+                // ---- Toast ----
+                const showToast = (msg, duration = 2000) => {
+                    toastMessage.value = msg;
+                    toastVisible.value = true;
+                    if (toastTimer) clearTimeout(toastTimer);
+                    toastTimer = setTimeout(() => { toastVisible.value = false; }, duration);
+                };
+
+                // ---- 通知 ----
+                const requestNotification = async () => {
+                    if (!('Notification' in window)) {
+                        showToast('此浏览器不支持通知，请使用 Chrome 或 Edge');
+                        return;
+                    }
+                    if (Notification.permission === 'granted') {
+                        settings.notificationPermission = 'granted';
+                        showToast('通知已开启');
+                        return;
+                    }
+                    if (Notification.permission === 'denied') {
+                        showToast('通知已被拒绝，请在浏览器设置中开启');
+                        return;
+                    }
+                    const result = await Notification.requestPermission();
+                    settings.notificationPermission = result;
+                    if (result === 'granted') {
+                        showToast('通知开启成功');
+                        try {
+                            new Notification('空境', { body: '消息通知已开启' });
+                        } catch (e) {}
+                    } else {
+                        showToast('通知被拒绝');
+                    }
+                };
+
+                const sendNotification = (title, body) => {
+                    if (settings.notificationPermission === 'granted' && 'Notification' in window) {
+                        try {
+                            new Notification(title || '空境', { body: body || '有新消息' });
+                        } catch (e) {}
+                    }
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+                };
+
+                // ---- 持久化 ----
+                const debouncedSave = () => { if (saveTimer) clearTimeout(saveTimer);
+                    saveTimer = setTimeout(async () => { try { await localforage.setItem('liubai_v6_full', {
+                                messages: messages.value,
+                                profiles,
+                                settings,
+                                replyGroups: replyGroups.value,
+                                emojiLib: emojiLib.value,
+                                groupCollapsed: groupCollapsed
+                            }); } catch (e) {} }, 400); };
+                watch([messages, profiles, settings, replyGroups, emojiLib], debouncedSave, { deep: true });
+
+                const saveDraft = () => localStorage.setItem('liubai_draft', inputText.value);
+                const applyCSS = () => { document.getElementById('custom-css-injection').innerHTML = settings.customCSS; };
+                watch(() => settings.customCSS, applyCSS);
+                watch(() => settings.replyMin, (v) => { if (v > settings.replyMax) settings.replyMax = v; });
+                watch(() => settings.replyMax, (v) => { if (v < settings.replyMin) settings.replyMin = v; });
+
+                const onReplyRangeChange = () => {};
+
+                const toggleDarkMode = () => { settings.darkMode = !settings.darkMode;
+                    document.documentElement.classList.toggle('dark', settings.darkMode); };
+
+                const toggleSound = () => {
+                    settings.soundEnabled = !settings.soundEnabled;
+                    if (settings.soundEnabled) {
+                        if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                        playTone('test');
+                    }
+                };
+
+                const playTone = (type) => {
+                    if (!settings.soundEnabled) return;
+                    try {
+                        if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                        if (audioCtx.state === 'suspended') audioCtx.resume();
+                        const soundType = type === 'test' ? settings.soundType : settings.soundType;
+                        generateSound(soundType);
+                    } catch (e) {}
+                };
+
+                // ---- 消息渲染 (支持图文混排) ----
+                const formatMessageContent = (content) => {
+                    if (!content) return '';
+                    // 检测是否是图片表情 (存储为特殊格式)
+                    if (content.startsWith('[EMOJI_IMG]')) {
+                        const data = content.replace('[EMOJI_IMG]', '');
+                        return `<img src="${data}" style="max-width:120px; max-height:120px; border-radius:12px; display:inline-block; vertical-align:middle;">`;
+                    }
+                    // 检测是否是纯文本
+                    return content.replace(/\n/g, '<br>');
+                };
+
+                // ---- 消息系统 ----
+                const sendMessage = async (sender, contentRaw) => {
+                    if (!contentRaw) return;
+                    let content = contentRaw.trim();
+                    // 如果内容包含图片标记，保留
+                    const newMsg = {
+                        id: genId(),
+                        sender,
+                        content: content,
+                        timestamp: Date.now(),
+                        status: sender === 'me' ? 'sent' : 'read',
+                        isReadFlag: currentView.value === 'chat',
+                        isTyping: false
+                    };
+                    messages.value.push(newMsg);
+                    playTone('message');
+                    scrollToBottom();
+                    manageActiveTimer();
+                    updateUnread();
+
+                    if (sender === 'them' && currentView.value !== 'chat') {
+                        sendNotification(profiles.them.name + ' 发来消息', content.slice(0, 50));
+                    }
+                };
+
+                const handleSend = () => {
+                    const txt = inputText.value.trim();
+                    if (!txt) return;
+                    sendMessage('me', txt);
+                    inputText.value = '';
+                    saveDraft();
+                    if (settings.autoReply) scheduleReply();
+                };
+
+                // ---- 表情选择器 ----
+                const openEmojiPicker = () => {
+                    showEmojiPicker.value = true;
+                    emojiPickerTab.value = 'emoji';
+                    nextTick(() => { if (window.lucide) lucide.createIcons(); });
+                };
+                const closeEmojiPicker = () => {
+                    showEmojiPicker.value = false;
+                };
+                const insertEmojiToInput = (emoji) => {
+                    if (emoji.type === 'image') {
+                        // 插入图片标记
+                        inputText.value += `[EMOJI_IMG]${emoji.data}`;
+                    } else {
+                        inputText.value += emoji.emoji;
+                    }
+                    closeEmojiPicker();
+                    // 聚焦到输入框
+                    nextTick(() => {
+                        const ta = document.querySelector('textarea');
+                        if (ta) ta.focus();
+                    });
+                };
+
+                const getReplyDelay = () => {
+                    const min = settings.replyMin || 10;
+                    const max = Math.max(settings.replyMax || 60, min + 5);
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                };
+
+                const scheduleReply = () => {
+                    if (replyTimer) clearTimeout(replyTimer);
+                    if (!settings.autoReply) return;
+                    const delay = getReplyDelay() * 1000;
+                    replyTimer = setTimeout(() => {
+                        if (isTyping.value) { scheduleReply(); return; }
+                        triggerReply(0);
+                    }, delay);
+                };
+
+                const triggerReply = (delay) => { if (isTyping.value) return;
+                    isTyping.value = true;
+                    const actualDelay = delay || 0;
+                    setTimeout(() => { isTyping.value = false; let pool = [];
+                        replyGroups.value.forEach(g => g.replies.forEach(r => { if (r.enabled && r.text.trim()) pool
+                                .push(r.text.trim()); }));
+                        if (pool.length) sendMessage('them', pool[Math.floor(Math.random() * pool.length)]);
+                        else sendMessage('them', '……');
+                        if (settings.autoReply) scheduleReply(); }, actualDelay); };
+                const forceReply = () => { if (!isTyping.value) { if (replyTimer) clearTimeout(replyTimer);
+                        triggerReply(300); } };
+
+                const manageActiveTimer = () => { if (activeTimer) clearInterval(activeTimer); if (settings.activeMessage)
+                        activeTimer = setInterval(() => { if (!settings.autoReply) return;
+                            triggerReply(500); }, settings.activeInterval * 1000); };
+                const scrollToBottom = () => nextTick(() => { const el = document.getElementById('chat-container'); if (el) el
+                        .scrollTop = el.scrollHeight; });
+                const updateUnread = () => { if (currentView.value === 'chat') { unreadCount.value = 0;
+                        messages.value.forEach(m => { if (m.sender === 'me') m.status = 'read'; }); } else { unreadCount
+                            .value = messages.value.filter(m => m.sender === 'them' && !m.isReadFlag).length; } };
+
+                // ---- 搜索 ----
+                const toggleSearch = () => { chatState.isSearching = !chatState.isSearching; if (!chatState.isSearching)
+                        chatState.keyword = '', chatState.results = []; };
+                const executeSearch = () => { const k = chatState.keyword.trim(); if (!k) { chatState.results = []; return; }
+                    chatState.results = messages.value.filter(m => m.content.includes(k)).map(m => m.id); if (chatState
+                        .results.length) { chatState.currentIdx = 0;
+                        jumpToMsg(); } };
+                const jumpSearch = (dir) => { chatState.currentIdx = (chatState.currentIdx + dir + chatState.results
+                        .length) % chatState.results.length;
+                    jumpToMsg(); };
+                const jumpToMsg = () => { const id = chatState.results[chatState.currentIdx]; const el = document
+                        .getElementById('msg-' + id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+                const highlightText = (text) => {
+                    if (!text) return '';
+                    let out = text;
+                    if (chatState.keyword && chatState.results.length) {
+                        const reg = new RegExp(`(${chatState.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                        out = text.replace(reg, '<span class="highlight">$1</span>');
+                    }
+                    return out;
+                };
+
+                const captureScreenshot = () => { const el = document.getElementById('capture-area'); if (!el) return;
+                    html2canvas(el, { backgroundColor: settings.darkMode ? '#0d0d0f' : '#f7f7f9', scale: 2 }).then(
+                    canvas => { const a = document.createElement('a');
+                        a.href = canvas.toDataURL();
+                        a.download = `留白_${Date.now()}.png`;
+                        a.click(); }); };
+
+                // ---- 分组折叠 ----
+                const toggleGroupCollapse = (groupId) => {
+                    groupCollapsed[groupId] = !groupCollapsed[groupId];
+                    debouncedSave();
+                };
+                const toggleAllGroups = () => {
+                    const newState = !allGroupsExpanded.value;
+                    allGroupsExpanded.value = newState;
+                    replyGroups.value.forEach(g => {
+                        groupCollapsed[g.id] = !newState;
+                    });
+                    debouncedSave();
+                };
+
+                // ---- 语料 CRUD ----
+                const addGroup = () => {
+                    const id = genId();
+                    replyGroups.value.push({ id: id, name: '新卷宗', replies: [] });
+                    groupCollapsed[id] = false;
+                    nextTick(initSortable);
+                };
+                const deleteGroup = (id) => { if (confirm('确定焚毁卷宗？')) { replyGroups.value = replyGroups.value.filter(g => g
+                            .id !== id);
+                        delete groupCollapsed[id];
+                        debouncedSave();
+                        nextTick(initSortable); } };
+                const addReplyToGroup = (gid) => { const g = replyGroups.value.find(x => x.id === gid); if (g) { g.replies
+                        .push({ id: genId(), text: '', enabled: true });
+                        debouncedSave();
+                        nextTick(initSortable); } };
+                const toggleReplyEnable = (reply) => { reply.enabled = !reply.enabled;
+                    debouncedSave(); };
+                const batchDelete = () => { if (!selectedRepliesArr.value.length) return; if (confirm(`删除 ${selectedRepliesArr.value.length} 条语料`)) {
+                        replyGroups.value.forEach(g => { g.replies = g.replies.filter(r => !selectedRepliesArr.value
+                                .includes(r.id)); });
+                        selectedRepliesArr.value = [];
+                        debouncedSave();
+                        nextTick(initSortable); } };
+                const batchToggle = () => { replyGroups.value.forEach(g => g.replies.forEach(r => { if (selectedRepliesArr
+                            .value.includes(r.id)) r.enabled = !r.enabled; }));
+                    selectedRepliesArr.value = [];
+                    debouncedSave(); };
+
+                // ---- 智能导入 ----
+                const triggerImport = () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.json';
+                    input.onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            try {
+                                const data = JSON.parse(ev.target.result);
+                                let texts = [];
+                                if (data.customReplies && Array.isArray(data.customReplies)) {
+                                    texts = data.customReplies.filter(t => t && t.trim()).map(t => t.trim());
+                                } else if (data.replyGroups) {
+                                    data.replyGroups.forEach(g => {
+                                        if (g.replies) g.replies.forEach(r => { if (r.text && r.text
+                                                .trim()) texts.push(r.text.trim()); });
+                                    });
+                                } else if (Array.isArray(data)) {
+                                    texts = data.filter(t => typeof t === 'string' && t.trim()).map(t => t
+                                    .trim());
+                                }
+                                if (!texts.length) { showToast('没有找到有效的语料条目'); return; }
+
+                                const groups = {};
+                                texts.forEach(text => {
+                                    const cat = autoCategorize(text);
+                                    if (!groups[cat]) groups[cat] = [];
+                                    groups[cat].push({ id: genId(), text: text, enabled: true });
+                                });
+
+                                const newGroups = Object.keys(groups).map(name => ({
+                                    id: genId(),
+                                    name: name,
+                                    replies: groups[name]
+                                }));
+
+                                if (confirm('覆盖现有所有语料？(取消则追加)')) {
+                                    replyGroups.value = newGroups;
+                                } else {
+                                    newGroups.forEach(ng => {
+                                        const existing = replyGroups.value.find(g => g.name === ng.name);
+                                        if (existing) {
+                                            existing.replies.push(...ng.replies);
+                                        } else {
+                                            replyGroups.value.push(ng);
+                                        }
+                                    });
+                                }
+                                // 初始化折叠状态
+                                replyGroups.value.forEach(g => {
+                                    if (!(g.id in groupCollapsed)) groupCollapsed[g.id] = false;
+                                });
+                                debouncedSave();
+                                nextTick(initSortable);
+                                showToast(`成功导入 ${texts.length} 条语料，分类为 ${Object.keys(groups).length} 组`);
+                            } catch (err) { showToast('解析失败: ' + err.message); }
+                        };
+                        reader.readAsText(file);
+                    };
+                    input.click();
+                };
+
+                // ---- 表情包 ----
+                const addEmojiItem = () => {
+                    emojiLib.value.push({ id: genId(), emoji: '😊', type: 'emoji' });
+                    debouncedSave();
+                    nextTick(initEmojiSortable);
+                };
+                const deleteEmoji = (id) => { emojiLib.value = emojiLib.value.filter(e => e.id !== id);
+                    debouncedSave();
+                    nextTick(initEmojiSortable); };
+
+                const addImageEmojis = (e) => {
+                    const files = e.target.files;
+                    if (!files.length) return;
+                    let count = 0;
+                    Array.from(files).forEach(file => {
+                        if (!file.type.startsWith('image/')) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            emojiLib.value.push({
+                                id: genId(),
+                                emoji: '',
+                                type: 'image',
+                                data: ev.target.result
+                            });
+                            count++;
+                            if (count === files.length) {
+                                debouncedSave();
+                                nextTick(initEmojiSortable);
+                                showToast(`添加了 ${count} 张图片表情`);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    e.target.value = '';
+                };
+
+                const initDefaultEmojis = () => {
+                    if (emojiLib.value.length === 0) {
+                        PRESET_EMOJIS.forEach(emoji => {
+                            emojiLib.value.push({ id: genId(), emoji: emoji, type: 'emoji' });
+                        });
+                    }
+                };
+
+                // ---- 全量导入导出 ----
+                const exportFullLibrary = () => { const data = { replyGroups: replyGroups.value, emojiLib: emojiLib
+                            .value, exportDate: new Date().toISOString() };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `留白全库_${Date.now()}.json`;
+                    a.click();
+                    showToast('导出成功'); };
+                const importFullLibrary = (e) => { const file = e.target.files[0]; if (!file) return; const reader =
+                    new FileReader();
+                    reader.onload = ev => { try { const data = JSON.parse(ev.target.result); if (data.replyGroups && Array
+                                .isArray(data.replyGroups)) { if (confirm('覆盖现有语料？(取消则合并)')) replyGroups.value = data
+                                .replyGroups;
+                            else replyGroups.value.push(...data.replyGroups); } if (data.emojiLib && Array.isArray(data
+                                .emojiLib)) { if (confirm('覆盖现有表情包？(取消则合并)')) emojiLib.value = data.emojiLib;
+                            else emojiLib.value.push(...data.emojiLib); }
+                            // 初始化折叠
+                            replyGroups.value.forEach(g => {
+                                if (!(g.id in groupCollapsed)) groupCollapsed[g.id] = false;
+                            });
+                            debouncedSave();
+                            nextTick(() => { initSortable();
+                                initEmojiSortable(); });
+                            showToast('导入成功！'); } catch (err) { showToast('文件格式错误'); } };
+                    reader.readAsText(file);
+                    e.target.value = ''; };
+
+                // ---- Sortable 初始化 ----
+                const initSortable = () => { if (groupSortable) groupSortable.destroy();
+                    replySortables.forEach(s => s.destroy());
+                    replySortables = [];
+                    const container = document.getElementById('library-groups'); if (!container) return;
+                    groupSortable = new Sortable(container, { animation: 180, handle: '.drag-handle-group',
+                        onEnd: () => { const groups = [];
+                            document.querySelectorAll('.group-item').forEach(gEl => { const gId = gEl.dataset.id;
+                                const foundGroup = replyGroups.value.find(g => g.id === gId); if (foundGroup) { const
+                                    repliesOrder = [];
+                                    gEl.querySelectorAll('.reply-item').forEach(rEl => { const rid = rEl.dataset
+                                            .id; const rep = foundGroup.replies.find(r => r.id === rid); if (
+                                            rep) repliesOrder.push(rep); });
+                                    groups.push({ ...foundGroup, replies: repliesOrder }); } }); if (groups.length)
+                                replyGroups.value = groups;
+                            debouncedSave(); } });
+                    document.querySelectorAll('.reply-list').forEach(listEl => { replySortables.push(new Sortable(listEl, {
+                            group: { name: 'sharedReplies', pull: true, revertClone: false },
+                            animation: 180,
+                            handle: '.drag-handle-reply',
+                            onEnd: (evt) => { const targetGroupId = evt.to.closest('.group-item')?.dataset.id;
+                                const sourceGroupId = evt.from.closest('.group-item')?.dataset.id; if (
+                                    targetGroupId && sourceGroupId && targetGroupId !== sourceGroupId) { const
+                                    sourceGroup = replyGroups.value.find(g => g.id === sourceGroupId); const
+                                    targetGroup = replyGroups.value.find(g => g.id === targetGroupId); const
+                                    movedId = evt.item.dataset.id; const movedReply = sourceGroup?.replies
+                                    .find(r => r.id === movedId); if (movedReply && targetGroup) { sourceGroup
+                                        .replies = sourceGroup.replies.filter(r => r.id !== movedId);
+                                        targetGroup.replies.push(movedReply);
+                                        debouncedSave();
+                                        nextTick(initSortable); } } else { const newGroups = [];
+                                    document.querySelectorAll('.group-item').forEach(gEl => { const gid = gEl
+                                            .dataset.id; const g = replyGroups.value.find(gr => gr.id ===
+                                            gid); if (g) { const newReplies = [];
+                                            gEl.querySelectorAll('.reply-item').forEach(rEl => { const rep =
+                                                g.replies.find(r => r.id === rEl.dataset.id); if (rep)
+                                                    newReplies.push(rep); });
+                                            newGroups.push({ ...g, replies: newReplies }); } }); if (
+                                        newGroups.length) replyGroups.value = newGroups;
+                                    debouncedSave(); } }
+                        })) }); };
+
+                const initEmojiSortable = () => { if (emojiSortable) emojiSortable.destroy(); const container = document
+                        .getElementById('emoji-list'); if (!container) return;
+                    emojiSortable = new Sortable(container, { animation: 180, handle: '.drag-handle-emoji',
+                        onEnd: () => { const newEmojis = [];
+                            document.querySelectorAll('#emoji-list .card-item').forEach(el => { const id = el.dataset
+                                    .id; const e = emojiLib.value.find(em => em.id === id); if (e) newEmojis.push(
+                                    e); });
+                            if (newEmojis.length) emojiLib.value = newEmojis;
+                            debouncedSave(); } }); };
+
+                // ---- 视图切换 ----
+                const switchView = (v) => { currentView.value = v; if (v === 'chat') { messages.value.forEach(m => m
+                            .isReadFlag = true);
+                        updateUnread();
+                        scrollToBottom(); } else if (v === 'library') { nextTick(() => { initSortable();
+                            initEmojiSortable(); }); }
+                    nextTick(() => { if (window.lucide) lucide.createIcons(); }); };
+
+                const formatTime = (ts) => { const d = new Date(ts); const now = new Date(); if (d.toDateString() === now
+                        .toDateString()) return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+                    return `${d.getMonth()+1}/${d.getDate()}`; };
+                const shouldShowAvatar = (idx) => idx === 0 || messages.value[idx].sender !== messages.value[idx - 1]
+                    .sender || (messages.value[idx].timestamp - messages.value[idx - 1].timestamp > 120000);
+                const deleteMsg = (id) => { messages.value = messages.value.filter(m => m.id !== id); };
+                const editName = (role) => { const n = prompt(`为${profiles[role].name}赋予新名`, profiles[role].name); if (n && n
+                        .trim()) profiles[role].name = n.trim().slice(0, 10); };
+                const editAvatar = (role) => { if (!confirm('设定新像？取消则移除')) { profiles[role].avatar = ''; return; } const
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = e => { const file = e.target.files[0]; if (file) { const fr = new FileReader();
+                            fr.onload = ev => profiles[role].avatar = ev.target.result;
+                            fr.readAsDataURL(file); } };
+                    input.click(); };
+                const uploadBgToLibrary = (e) => { const f = e.target.files[0]; if (f) { const fr = new FileReader();
+                        fr.onload = ev => { settings.bgLibrary.push(ev.target.result);
+                            settings.bgImage = ev.target.result; };
+                        fr.readAsDataURL(f); } };
+                const setBg = (bg) => settings.bgImage = bg;
+                const removeBg = (idx) => { if (settings.bgImage === settings.bgLibrary[idx]) settings.bgImage = '';
+                    settings.bgLibrary.splice(idx, 1); };
+                const appBgStyle = computed(() => settings.bgImage ? { backgroundImage: `url(${settings.bgImage})`,
+                        backgroundSize: 'cover', backgroundPosition: 'center' } : {});
+                const clearChat = () => { if (confirm('焚毁所有对话记忆？')) { messages.value = [];
+                        switchView('home'); } };
+                const filteredGroups = computed(() => { const q = libSearchQuery.value.trim().toLowerCase(); if (!q) return replyGroups
+                        .value; return replyGroups.value.map(g => ({ ...g, replies: g.replies.filter(r => r.text
+                            .toLowerCase().includes(q)) })).filter(g => g.replies.length || g.name.toLowerCase()
+                        .includes(q)); });
+                const statData = computed(() => { const total = messages.value.length; if (!total) return { myRatio: 50,
+                        firstTime: '尚未涉足', hotWords: [] }; const myCount = messages.value.filter(m => m.sender === 'me')
+                        .length; const first = messages.value[0]?.timestamp ? new Date(messages.value[0].timestamp)
+                        .toLocaleDateString() : '—'; const allText = messages.value.map(m => m.content).join(''); const
+                    words = allText.match(/[\u4e00-\u9fa5]{2,4}/g) || []; const freq = {};
+                    words.forEach(w => freq[w] = (freq[w] || 0) + 1); const hot = Object.entries(freq).map(([k, v]) => ({ text: k,
+                            count: v })).sort((a, b) => b.count - a.count).slice(0, 8); return { myRatio: Math.round(
+                            myCount / total * 100), firstTime: first, hotWords: hot }; });
+
+                // ---- 生命周期 ----
+                onMounted(async () => {
+                    try {
+                        const stored = await localforage.getItem('liubai_v6_full');
+                        if (stored) {
+                            if (stored.messages) messages.value = stored.messages;
+                            if (stored.profiles) Object.assign(profiles, stored.profiles);
+                            if (stored.settings) Object.assign(settings, stored.settings);
+                            if (stored.replyGroups) replyGroups.value = stored.replyGroups;
+                            if (stored.emojiLib) emojiLib.value = stored.emojiLib;
+                            if (stored.groupCollapsed) Object.assign(groupCollapsed, stored.groupCollapsed);
+                            if (settings.darkMode) document.documentElement.classList.add('dark');
+                        }
+                        initDefaultEmojis();
+                        // 初始化折叠状态
+                        replyGroups.value.forEach(g => {
+                            if (!(g.id in groupCollapsed)) groupCollapsed[g.id] = false;
+                        });
+
+                        if ('Notification' in window) {
+                            settings.notificationPermission = Notification.permission;
+                        }
+                        const draft = localStorage.getItem('liubai_draft');
+                        if (draft) inputText.value = draft;
+                        updateUnread();
+                        applyCSS();
+                        if (settings.soundEnabled) {
+                            audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                        }
+                        manageActiveTimer();
+                        if (settings.autoReply) scheduleReply();
+                        setTimeout(() => { showIntro.value = false; }, 2800);
+                        document.addEventListener('click', () => { if (settings.soundEnabled && audioCtx?.state ===
+                                'suspended') audioCtx.resume(); }, { once: true });
+                        nextTick(() => { if (window.lucide) lucide.createIcons();
+                            initSortable();
+                            initEmojiSortable(); });
+                    } catch (e) { console.warn('Load error:', e); }
+                });
+
+                onUnmounted(() => {
+                    if (activeTimer) clearInterval(activeTimer);
+                    if (replyTimer) clearTimeout(replyTimer);
+                });
+
+                return {
+                    showIntro,
+                    currentView,
+                    unreadCount,
+                    messages,
+                    inputText,
+                    isTyping,
+                    profiles,
+                    settings,
+                    replyGroups,
+                    emojiLib,
+                    libTab,
+                    libSearchQuery,
+                    selectedRepliesArr,
+                    chatState,
+                    statData,
+                    toastMessage,
+                    toastVisible,
+                    showEmojiPicker,
+                    emojiPickerTab,
+                    groupCollapsed,
+                    allGroupsExpanded,
+                    switchView,
+                    handleSend,
+                    forceReply,
+                    deleteMsg,
+                    editName,
+                    editAvatar,
+                    saveDraft,
+                    shouldShowAvatar,
+                    formatTime,
+                    formatMessageContent,
+                    highlightText,
+                    toggleSearch,
+                    executeSearch,
+                    jumpSearch,
+                    captureScreenshot,
+                    toggleDarkMode,
+                    toggleSound,
+                    uploadBgToLibrary,
+                    setBg,
+                    removeBg,
+                    appBgStyle,
+                    clearChat,
+                    addGroup,
+                    deleteGroup,
+                    addReplyToGroup,
+                    batchDelete,
+                    batchToggle,
+                    exportFullLibrary,
+                    importFullLibrary,
+                    debouncedSave,
+                    toggleReplyEnable,
+                    filteredGroups,
+                    addEmojiItem,
+                    deleteEmoji,
+                    addImageEmojis,
+                    triggerImport,
+                    requestNotification,
+                    onReplyRangeChange,
+                    scheduleReply,
+                    getReplyDelay,
+                    playTone,
+                    toggleGroupCollapse,
+                    toggleAllGroups,
+                    openEmojiPicker,
+                    closeEmojiPicker,
+                    insertEmojiToInput
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
