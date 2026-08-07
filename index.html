@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>留白</title>
+
     <script src="https://unpkg.com/vue@3/dist/vue.global.js">
     </script>
     <script src="https://cdn.tailwindcss.com">
@@ -15,6 +16,7 @@
     <script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet" />
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -31,6 +33,7 @@
             }
         }
     </script>
+
     <style>
         :root {
             --color-bg: #f7f7f9;
@@ -53,29 +56,19 @@
             --color-bubble-send: #242424;
             --color-bubble-receive: #181818;
         }
-        * {
-            box-sizing: border-box;
-        }
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
+
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
             overflow: hidden;
             background-color: #d1d5db;
             -webkit-font-smoothing: antialiased;
         }
-        .dark body {
-            background-color: #050505;
-        }
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
+        .dark body { background-color: #050505; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
         .app-container {
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100dvh;
             background: var(--color-bg);
             position: relative;
             display: flex;
@@ -84,14 +77,14 @@
         }
         @media (min-width: 768px) {
             .app-container {
-                width: 375px;
-                height: 812px;
+                width: 375px; height: 812px;
                 border-radius: 40px;
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 0 0 8px #000;
                 border: 1px solid #333;
                 margin: 0 auto;
             }
         }
+
         .msg-bubble {
             display: inline-block !important;
             padding: 10px 16px !important;
@@ -120,6 +113,7 @@
             background: var(--color-bubble-receive) !important;
             border: 1px solid var(--color-border) !important;
         }
+
         .avatar {
             width: 32px;
             height: 32px;
@@ -131,15 +125,10 @@
             flex-shrink: 0;
         }
         @media (min-width: 768px) {
-            .avatar {
-                width: 36px;
-                height: 36px;
-            }
-            .avatar-header {
-                width: 36px;
-                height: 36px;
-            }
+            .avatar { width: 36px; height: 36px; }
+            .avatar-header { width: 36px; height: 36px; }
         }
+
         .transfer-card-bubble {
             background: #faf8f5;
             border-radius: 12px;
@@ -174,6 +163,7 @@
         .transfer-card-bubble .status.pending {
             color: var(--color-muted);
         }
+
         .redpacket-card-bubble {
             background: #fce4e0;
             border-radius: 12px;
@@ -211,11 +201,13 @@
         .redpacket-card-bubble .status.pending {
             color: var(--color-muted);
         }
+
         .highlight {
             background-color: rgba(255, 208, 0, 0.5);
             border-radius: 4px;
             padding: 0 2px;
         }
+
         .view-enter-active,
         .view-leave-active {
             transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -239,30 +231,21 @@
         .fade-leave-to {
             opacity: 0;
         }
+
         .intro-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
+            position: fixed; inset: 0; z-index: 100;
             background: var(--color-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; gap: 8px;
         }
         .intro-line {
             font-family: 'Noto Serif SC', serif;
-            font-size: 28px;
-            font-weight: 300;
+            font-size: 28px; font-weight: 300;
             letter-spacing: 0.3em;
-            opacity: 0;
-            transform: translateY(12px);
+            opacity: 0; transform: translateY(12px);
         }
-        .intro-line.show {
-            opacity: 1;
-            transform: translateY(0);
-            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .intro-line.show { opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.2,0.8,0.2,1); }
+
         .tab-bar {
             display: flex;
             border-bottom: 1px solid var(--color-border);
@@ -270,23 +253,15 @@
             flex-shrink: 0;
         }
         .tab-bar button {
-            flex: 1;
-            padding: 10px 0;
-            font-size: 12px;
-            letter-spacing: 0.1em;
+            flex: 1; padding: 10px 0;
+            font-size: 12px; letter-spacing: 0.1em;
             color: var(--color-muted);
             border-bottom: 2px solid transparent;
             transition: all 0.2s;
         }
-        .tab-bar button.active {
-            color: var(--color-text);
-            border-bottom-color: var(--color-accent);
-        }
-        .library-section {
-            padding: 12px 16px;
-            overflow-y: auto;
-            flex: 1;
-        }
+        .tab-bar button.active { color: var(--color-text); border-bottom-color: var(--color-accent); }
+
+        .library-section { padding: 12px 16px; overflow-y: auto; flex: 1; }
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
@@ -303,123 +278,70 @@
             cursor: default;
             word-break: break-all;
         }
-        .card-item .card-emoji {
-            font-size: 30px;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .card-item .card-image {
-            width: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            border-radius: 8px;
-            background: var(--color-bg);
-        }
-        .drag-handle-group,
-        .drag-handle-reply,
-        .drag-handle-emoji {
-            cursor: grab;
-        }
-        .drag-handle-group:active,
-        .drag-handle-reply:active,
-        .drag-handle-emoji:active {
-            cursor: grabbing;
-        }
-        .reply-item {
-            transition: background 0.1s ease;
-        }
+        .card-item .card-emoji { font-size: 30px; display: block; margin-bottom: 2px; }
+        .card-item .card-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; background: var(--color-bg); }
+
+        .drag-handle-group, .drag-handle-reply, .drag-handle-emoji { cursor: grab; }
+        .drag-handle-group:active, .drag-handle-reply:active, .drag-handle-emoji:active { cursor: grabbing; }
+        .reply-item { transition: background 0.1s ease; }
+
         .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 10px 24px;
-            border-radius: 12px;
-            font-size: 13px;
-            z-index: 999;
-            backdrop-filter: blur(8px);
-            pointer-events: none;
-            transition: opacity 0.3s;
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: #fff;
+            padding: 10px 24px; border-radius: 12px; font-size: 13px;
+            z-index: 999; backdrop-filter: blur(8px);
+            pointer-events: none; transition: opacity 0.3s;
         }
+
         .range-slider {
-            position: relative;
-            height: 6px;
-            background: var(--color-border);
-            border-radius: 3px;
+            position: relative; height: 6px;
+            background: var(--color-border); border-radius: 3px;
             margin: 12px 0;
         }
         .range-slider .track {
-            position: absolute;
-            height: 6px;
-            background: var(--color-accent);
-            border-radius: 3px;
+            position: absolute; height: 6px;
+            background: var(--color-accent); border-radius: 3px;
             opacity: 0.4;
         }
         .range-slider input[type="range"] {
-            position: absolute;
-            width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: transparent;
-            pointer-events: none;
-            top: 0;
-            left: 0;
+            position: absolute; width: 100%; height: 6px;
+            -webkit-appearance: none; appearance: none;
+            background: transparent; pointer-events: none;
+            top: 0; left: 0;
         }
         .range-slider input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--color-text);
-            cursor: pointer;
+            -webkit-appearance: none; appearance: none;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--color-text); cursor: pointer;
             pointer-events: auto;
             border: 2px solid var(--color-surface);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
         }
         .range-slider input[type="range"]::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--color-text);
-            cursor: pointer;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--color-text); cursor: pointer;
             pointer-events: auto;
             border: 2px solid var(--color-surface);
         }
-        .range-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            color: var(--color-muted);
-            margin-top: 4px;
+        .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--color-muted); margin-top: 4px; }
+
+        .no-cursor { caret-color: transparent; }
+        .no-cursor::after { display: none !important; }
+
+        .group-collapse-toggle { transition: transform 0.3s ease; }
+        .group-collapse-toggle.collapsed { transform: rotate(-90deg); }
+        .group-replies-container { overflow: hidden; transition: max-height 0.3s ease; }
+        .group-replies-container.collapsed { max-height: 0 !important; }
+
+        textarea { font-family: inherit; }
+
+        /* ===== 聊天容器 ===== */
+        #chat-container {
+            padding-bottom: 140px !important;
         }
-        .no-cursor {
-            caret-color: transparent;
-        }
-        .no-cursor::after {
-            display: none !important;
-        }
-        .group-collapse-toggle {
-            transition: transform 0.3s ease;
-        }
-        .group-collapse-toggle.collapsed {
-            transform: rotate(-90deg);
-        }
-        .group-replies-container {
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .group-replies-container.collapsed {
-            max-height: 0 !important;
-        }
-        textarea {
-            font-family: inherit;
-        }
+
         .chat-footer {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
@@ -432,6 +354,7 @@
             flex-shrink: 0;
             z-index: 10;
         }
+
         .chat-footer .input-wrap {
             display: flex;
             align-items: flex-end;
@@ -442,79 +365,43 @@
             padding: 4px 6px;
             transition: border-color 0.2s;
         }
-        .chat-footer .input-wrap:focus-within {
-            border-color: var(--color-text);
-        }
+        .chat-footer .input-wrap:focus-within { border-color: var(--color-text); }
         .chat-footer textarea {
-            flex: 1;
-            border: none;
-            background: transparent;
+            flex: 1; border: none; background: transparent;
             padding: 6px 4px;
-            font-size: 15px;
-            line-height: 1.4;
-            resize: none;
-            max-height: 100px;
-            color: var(--color-text);
-            outline: none;
-            min-height: 36px;
-            font-family: inherit;
+            font-size: 15px; line-height: 1.4;
+            resize: none; max-height: 100px;
+            color: var(--color-text); outline: none;
+            min-height: 36px; font-family: inherit;
         }
-        .chat-footer textarea::placeholder {
-            color: var(--color-muted);
-            opacity: 0.5;
-        }
+        .chat-footer textarea::placeholder { color: var(--color-muted); opacity: 0.5; }
         .chat-footer .btn-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: var(--color-muted);
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--color-muted);
             transition: all 0.2s;
-            background: transparent;
-            border: none;
-            cursor: pointer;
+            background: transparent; border: none; cursor: pointer;
         }
-        .chat-footer .btn-icon:hover {
-            color: var(--color-text);
-            background: var(--color-border);
-        }
-        .chat-footer .btn-icon.send {
-            background: var(--color-text);
-            color: var(--color-surface);
-        }
-        .chat-footer .btn-icon.send:active {
-            transform: scale(0.92);
-        }
-        .chat-footer .btn-icon:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-        }
+        .chat-footer .btn-icon:hover { color: var(--color-text); background: var(--color-border); }
+        .chat-footer .btn-icon.send { background: var(--color-text); color: var(--color-surface); }
+        .chat-footer .btn-icon.send:active { transform: scale(0.92); }
+        .chat-footer .btn-icon:disabled { opacity: 0.3; pointer-events: none; }
+
         .home-nav {
-            position: absolute;
-            bottom: 24px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
+            position: absolute; bottom: 24px; left: 20px; right: 20px;
+            display: flex; justify-content: space-around; align-items: center;
             z-index: 20;
             background: var(--color-surface);
             border-radius: 20px;
             padding: 8px 4px;
             border: 1px solid var(--color-border);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
         }
         .home-nav button {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
             gap: 2px;
-            background: transparent;
-            border: none;
+            background: transparent; border: none;
             color: var(--color-muted);
             font-size: 10px;
             letter-spacing: 0.05em;
@@ -523,163 +410,106 @@
             transition: color 0.2s;
             font-family: inherit;
         }
-        .home-nav button:hover {
-            color: var(--color-text);
-        }
-        .home-nav button i {
-            width: 20px;
-            height: 20px;
-            stroke-width: 1.5;
-        }
-        .home-nav button .label {
-            font-size: 9px;
-            opacity: 0.7;
-        }
+        .home-nav button:hover { color: var(--color-text); }
+        .home-nav button i { width: 20px; height: 20px; stroke-width: 1.5; }
+        .home-nav button .label { font-size: 9px; opacity: 0.7; }
+
         .home-main-btn {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: var(--color-accent);
-            color: var(--color-surface);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            width: 120px; height: 120px; border-radius: 50%;
+            background: var(--color-accent); color: var(--color-surface);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
             border: none;
             font-family: 'Noto Serif SC', serif;
             letter-spacing: 0.2em;
             position: relative;
             margin-top: -20px;
         }
-        .home-main-btn:active {
-            transform: scale(0.94);
-        }
-        .home-main-btn .icon {
-            font-size: 32px;
-            margin-bottom: 4px;
-        }
-        .home-main-btn .label {
-            font-size: 14px;
-            font-weight: 300;
-        }
+        .home-main-btn:active { transform: scale(0.94); }
+        .home-main-btn .icon { font-size: 32px; margin-bottom: 4px; }
+        .home-main-btn .label { font-size: 14px; font-weight: 300; }
         .home-main-btn .badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            min-width: 20px;
-            height: 20px;
+            position: absolute; top: -4px; right: -4px;
+            background: #ef4444; color: #fff;
+            font-size: 11px; font-weight: 600;
+            min-width: 20px; height: 20px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             padding: 0 5px;
             border: 2px solid var(--color-surface);
         }
         .home-subtitle {
             font-family: 'Noto Serif SC', serif;
-            font-size: 13px;
-            letter-spacing: 0.3em;
-            color: var(--color-muted);
-            opacity: 0.6;
+            font-size: 13px; letter-spacing: 0.3em;
+            color: var(--color-muted); opacity: 0.6;
             margin-top: 12px;
         }
         .home-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 20px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100%; padding: 20px;
             padding-bottom: 100px;
         }
-        .font-css-target {
-            font-family: inherit;
-        }
+
+        .font-css-target { font-family: inherit; }
+
         .msg-popup {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
             padding: 4px 0;
             min-width: 120px;
             overflow: hidden;
             z-index: 60;
         }
         .msg-popup button {
-            display: block;
-            width: 100%;
-            padding: 8px 16px;
-            text-align: left;
-            font-size: 13px;
-            background: transparent;
-            border: none;
+            display: block; width: 100%; padding: 8px 16px;
+            text-align: left; font-size: 13px;
+            background: transparent; border: none;
             color: var(--color-text);
-            cursor: pointer;
-            transition: background 0.15s;
+            cursor: pointer; transition: background 0.15s;
             font-family: inherit;
         }
-        .msg-popup button:hover {
-            background: var(--color-border);
-        }
-        .msg-popup button.danger {
-            color: #dc2626;
-        }
+        .msg-popup button:hover { background: var(--color-border); }
+        .msg-popup button.danger { color: #dc2626; }
+
         .input-menu-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 55;
+            position: fixed; inset: 0; z-index: 55;
             background: transparent;
         }
         .input-menu {
-            position: absolute;
-            bottom: 80px;
-            left: 0;
-            right: 0;
+            position: absolute; bottom: 80px; left: 0; right: 0;
             background: var(--color-surface);
             border-radius: 16px 16px 0 0;
             border-top: 1px solid var(--color-border);
             padding: 16px 20px 24px;
-            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+            box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
         }
         .input-menu button {
             padding: 10px 18px;
-            background: var(--color-bg);
-            border: none;
+            background: var(--color-bg); border: none;
             border-radius: 10px;
-            color: var(--color-text);
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.15s;
+            color: var(--color-text); font-size: 13px;
+            cursor: pointer; transition: background 0.15s;
             font-family: inherit;
             letter-spacing: 0.05em;
             min-width: 60px;
         }
-        .input-menu button:hover {
-            background: var(--color-border);
-        }
+        .input-menu button:hover { background: var(--color-border); }
+
         .emoji-selector {
-            position: absolute;
-            bottom: 140px;
-            left: 0;
-            right: 0;
+            position: absolute; bottom: 140px; left: 0; right: 0;
             background: var(--color-surface);
             border-radius: 16px 16px 0 0;
             border-top: 1px solid var(--color-border);
             padding: 16px 16px 20px;
             max-height: 220px;
             overflow-y: auto;
-            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
             gap: 4px;
@@ -693,9 +523,7 @@
             cursor: pointer;
             transition: background 0.15s;
         }
-        .emoji-selector button:hover {
-            background: var(--color-border);
-        }
+        .emoji-selector button:hover { background: var(--color-border); }
         .emoji-selector .close-btn {
             grid-column: 1 / -1;
             font-size: 13px;
@@ -705,15 +533,12 @@
             border-radius: 8px;
             margin-top: 4px;
         }
+
         .transfer-modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.4);
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             padding: 20px;
         }
         .transfer-modal {
@@ -722,19 +547,16 @@
             padding: 28px 24px 24px;
             max-width: 340px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
             border: 1px solid var(--color-border);
         }
         .transfer-modal .title {
-            font-size: 18px;
-            font-weight: 500;
-            text-align: center;
-            letter-spacing: 0.1em;
+            font-size: 18px; font-weight: 500;
+            text-align: center; letter-spacing: 0.1em;
             margin-bottom: 20px;
         }
         .transfer-modal input {
-            width: 100%;
-            padding: 12px 14px;
+            width: 100%; padding: 12px 14px;
             border: 1px solid var(--color-border);
             border-radius: 12px;
             background: var(--color-bg);
@@ -744,27 +566,17 @@
             font-family: inherit;
             margin-bottom: 12px;
         }
-        .transfer-modal input:focus {
-            border-color: var(--color-text);
-        }
+        .transfer-modal input:focus { border-color: var(--color-text); }
         .transfer-modal .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 4px;
+            display: flex; gap: 10px; margin-top: 4px;
         }
         .transfer-modal .btn-row button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            font-size: 15px;
-            cursor: pointer;
-            font-family: inherit;
+            flex: 1; padding: 12px; border-radius: 12px;
+            border: none; font-size: 15px;
+            cursor: pointer; font-family: inherit;
             transition: opacity 0.2s;
         }
-        .transfer-modal .btn-row button:hover {
-            opacity: 0.8;
-        }
+        .transfer-modal .btn-row button:hover { opacity: 0.8; }
         .transfer-modal .btn-row .confirm {
             background: var(--color-text);
             color: var(--color-surface);
@@ -773,45 +585,33 @@
             background: var(--color-border);
             color: var(--color-text);
         }
+
         .reply-preview {
-            position: fixed;
-            bottom: 80px;
-            left: 16px;
-            right: 16px;
+            position: fixed; bottom: 80px; left: 16px; right: 16px;
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 12px;
             padding: 8px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.1);
             z-index: 20;
             max-width: 375px;
             margin: 0 auto;
         }
         .reply-preview .label {
-            font-size: 10px;
-            color: var(--color-muted);
-            letter-spacing: 0.1em;
-            flex-shrink: 0;
+            font-size: 10px; color: var(--color-muted);
+            letter-spacing: 0.1em; flex-shrink: 0;
         }
         .reply-preview .text {
-            flex: 1;
-            font-size: 13px;
-            color: var(--color-text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            flex: 1; font-size: 13px; color: var(--color-text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .reply-preview .close {
-            background: none;
-            border: none;
-            color: var(--color-muted);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 0 4px;
+            background: none; border: none;
+            color: var(--color-muted); cursor: pointer;
+            font-size: 16px; padding: 0 4px;
         }
+
         .msg-bubble .reply-indicator {
             display: block;
             font-size: 11px;
@@ -824,6 +624,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .chat-view-bg {
             background: var(--color-bg);
             transition: background-image 0.3s ease;
@@ -835,10 +636,45 @@
         .chat-view-bg .chat-messages {
             background: transparent;
         }
+
+        .msg-select-mode .msg-bubble {
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .msg-select-mode .msg-bubble.selected {
+            border-color: var(--color-accent);
+            background: var(--color-border);
+        }
+        .msg-select-bar {
+            position: fixed; bottom: 80px; left: 0; right: 0;
+            background: var(--color-surface);
+            border-top: 1px solid var(--color-border);
+            padding: 10px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 30;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+        }
+        .msg-select-bar button {
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+            background: var(--color-border);
+            color: var(--color-text);
+        }
+        .msg-select-bar .export-btn {
+            background: var(--color-text);
+            color: var(--color-surface);
+        }
+        .msg-select-bar .cancel-btn {
+            background: transparent;
+            color: var(--color-muted);
+        }
     </style>
     <style id="custom-css-injection"></style>
     <style id="font-css-injection"></style>
-    <meta name="AIGC" content='{"AIGC":{"Label":"2","ContentProducer":"WUSIGRAM","ProduceID":"N8ZPW/a2ETpG7RkweaeFdg==","ReservedCode1":"4CTgzwbXomZUuRFaBFcpQw9M/ZS7avurPNgaVqx77ojLKCHcjYG6+IklJAww2ELyilyitDQ5qGusXP/TjK+yaA==","ContentPropagator":"","PropagateID":"","ReservedCode2":""}}'>
 </head>
 <body class="flex justify-center items-center h-screen w-screen transition-colors duration-300">
 
@@ -876,7 +712,7 @@
                         </button>
                         <button @click="switchView('settings')">
                             <i data-lucide="sliders-horizontal"></i>
-                            <span class="label">偏好</span>
+                            <span class="label">法则</span>
                         </button>
                     </div>
                 </div>
@@ -886,7 +722,7 @@
                         <div class="flex items-center gap-2">
                             <button @click="switchView('home')" class="p-2 -ml-1 text-text hover:opacity-60"><i data-lucide="chevron-left" class="w-5 h-5 stroke-[1.5]"></i></button>
                             <div class="flex items-center gap-2 group cursor-pointer">
-                                <div v-if="settings.showAvatar" @click.stop="editAvatar('them')" class="avatar-header bg-surface border border-border/50 flex items-center justify-center overflow-hidden shadow-sm" :style="{ borderRadius: settings.avatarRadius + '%' }">
+                                <div v-if="settings.showAvatar" @click.stop="editAvatar('them')" class="avatar-header bg-surface border border-border/50 flex items-center justify-center overflow-hidden shadow-sm" :style="{ borderRadius: settings.avatarRadius + '%', width: settings.avatarSize + 'px', height: settings.avatarSize + 'px' }">
                                     <img v-if="profiles.them.avatar" :src="profiles.them.avatar" class="w-full h-full object-cover">
                                     <span v-else class="text-xs text-muted serif-text">{{ profiles.them.name.charAt(0) }}</span>
                                 </div>
@@ -897,6 +733,9 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1">
+                            <button @click="toggleSelectMode" class="p-2 text-muted hover:text-text" title="选择消息">
+                                <i data-lucide="check-square" class="w-4 h-4 stroke-[1.5]"></i>
+                            </button>
                             <button @click="toggleSearch" class="p-2 text-muted hover:text-text"><i data-lucide="search" class="w-4 h-4 stroke-[1.5]"></i></button>
                         </div>
                     </header>
@@ -910,11 +749,11 @@
                         <button @click="toggleSearch" class="p-1 text-red-400"><i data-lucide="x" class="w-3 h-3"></i></button>
                     </div>
 
-                    <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-4 scroll-smooth pb-24">
+                    <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-4 scroll-smooth" @click="closeMsgMenu">
                         <div id="capture-area">
-                            <div v-for="(msg, index) in messages" :key="msg.id" :id="'msg-'+msg.id" class="mb-5 relative group flex" :class="msg.sender === 'me' ? 'justify-end' : 'justify-start'">
+                            <div v-for="(msg, index) in messages" :key="msg.id" :id="'msg-'+msg.id" class="relative group flex" :class="[msg.sender === 'me' ? 'justify-end' : 'justify-start', msgSelectMode ? 'cursor-pointer' : '']" :style="{ marginBottom: settings.bubbleGap + 'px' }" @click="handleMsgClick(msg, $event, index)">
                                 <div class="flex max-w-[85%] gap-2" :class="msg.sender === 'me' ? 'flex-row-reverse' : 'flex-row'">
-                                    <div v-if="settings.showAvatar" class="avatar mt-1 cursor-pointer" :class="{'opacity-0': !shouldShowAvatar(index)}" @click="editAvatar(msg.sender)">
+                                    <div v-if="settings.showAvatar" class="mt-1 cursor-pointer" :class="{'opacity-0': !shouldShowAvatar(index)}" :style="{ width: settings.avatarSize + 'px', height: settings.avatarSize + 'px' }" @click="editAvatar(msg.sender)">
                                         <div class="w-full h-full bg-surface border border-border/50 flex items-center justify-center overflow-hidden" :style="{ borderRadius: settings.avatarRadius + '%' }">
                                             <img v-if="profiles[msg.sender].avatar" :src="profiles[msg.sender].avatar" class="w-full h-full object-cover">
                                             <span v-else class="text-[10px] text-muted serif-text">{{ profiles[msg.sender].name.charAt(0) }}</span>
@@ -923,9 +762,8 @@
                                     <div class="flex flex-col relative" :class="msg.sender === 'me' ? 'items-end' : 'items-start'">
                                         <span v-if="settings.showNickname && shouldShowAvatar(index)" class="text-[10px] text-muted/60 mb-1 px-1 tracking-widest">{{ profiles[msg.sender].name }}</span>
 
-                                        <!-- 点击消息弹出菜单 - 使用 @click 直接绑定 -->
-                                        <div class="msg-wrapper" @click="handleMsgClick(msg, $event)">
-                                            <div class="msg-bubble" :class="[msg.sender === 'me' ? 'send' : 'receive', msg.isRevoked ? 'opacity-50 italic' : '', 'font-css-target']" :style="{ fontSize: settings.fontSize + 'px' }">
+                                        <div class="msg-wrapper" @click.stop="handleMsgClick(msg, $event, index)">
+                                            <div class="msg-bubble" :class="[msg.sender === 'me' ? 'send' : 'receive', msg.isRevoked ? 'opacity-50 italic' : '', msgSelectMode && selectedMessages.includes(msg.id) ? 'selected' : '', 'font-css-target']" :style="{ fontSize: settings.fontSize + 'px' }">
                                                 <template v-if="msg.isRevoked">
                                                     <span class="text-muted/60 text-sm tracking-widest">已撤回</span>
                                                 </template>
@@ -953,11 +791,11 @@
                                             </div>
                                         </div>
 
-                                        <!-- 消息菜单弹窗 -->
-                                        <div v-if="activeMsgId === msg.id" class="absolute z-50 msg-popup" :style="menuPosition" @click.stop>
+                                        <div v-if="activeMsgId === msg.id" class="fixed z-50 msg-popup" :style="menuPosition" @click.stop>
                                             <button @click="replyToMsg(msg)">引用</button>
                                             <button v-if="!msg.isRevoked" @click="recallMsg(msg.id)" class="danger">撤回</button>
                                             <button @click="copyMsg(msg)" class="border-t border-border">复制</button>
+                                            <button @click="toggleSelectMsg(msg.id)" class="border-t border-border">选择</button>
                                             <button @click="closeMsgMenu" class="border-t border-border text-muted/60">取消</button>
                                         </div>
 
@@ -967,6 +805,7 @@
                                                 <i :data-lucide="msg.status === 'read' ? 'check-circle-2' : 'circle'" class="w-3 h-3 stroke-[1.5]"></i>
                                             </span>
                                             <span v-if="msg.type === 'transfer' || msg.type === 'redpacket'" class="text-muted/30">💰</span>
+                                            <span v-if="selectedMessages.includes(msg.id)" class="text-accent text-[10px]">✓</span>
                                         </div>
                                     </div>
                                 </div>
@@ -976,6 +815,12 @@
                             </div>
                         </div>
                     </main>
+
+                    <div v-if="msgSelectMode" class="msg-select-bar">
+                        <button class="cancel-btn" @click="toggleSelectMode">取消</button>
+                        <span class="text-xs text-muted">已选 {{ selectedMessages.length }} 条</span>
+                        <button class="export-btn" @click="exportSelectedChats" :disabled="selectedMessages.length === 0">导出选中</button>
+                    </div>
 
                     <div v-if="replyTarget" class="reply-preview" style="bottom: 80px; left: 16px; right: 16px; max-width: 375px; margin: 0 auto;">
                         <span class="label">引用</span>
@@ -1123,7 +968,17 @@
                     </header>
                     <main class="flex-1 overflow-y-auto p-4 space-y-6 pb-12">
                         <section><h3 class="text-[11px] font-semibold text-muted tracking-widest px-2 mb-2">陈列馆</h3>
-                            <div class="bg-surface border border-border rounded-xl p-3 flex gap-3 overflow-x-auto snap-x"><label class="w-16 h-24 shrink-0 border border-dashed border-border rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-bg"><i data-lucide="plus" class="w-4 h-4 text-muted"></i><span class="text-[9px] text-muted">添置</span><input type="file" accept="image/*" class="hidden" @change="uploadBgToLibrary"></label><div class="w-16 h-24 shrink-0 border rounded-md cursor-pointer flex items-center justify-center text-[10px] text-muted snap-center transition-all" :class="!settings.bgImage ? 'border-text bg-bg' : 'border-border bg-surface'" @click="setBg('')">无相</div><div v-for="(bg, idx) in settings.bgLibrary" :key="idx" class="w-16 h-24 shrink-0 rounded-md bg-cover bg-center cursor-pointer relative group snap-center" :style="{ backgroundImage: `url(${bg})` }" :class="settings.bgImage === bg ? 'ring-2 ring-text ring-offset-1' : ''" @click="setBg(bg)"><button @click.stop="removeBg(idx)" class="absolute -top-2 -right-2 w-5 h-5 bg-surface text-red-500 rounded-full shadow border border-border opacity-0 group-hover:opacity-100 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3"></i></button></div></div></section>
+                            <div class="bg-surface border border-border rounded-xl p-3 flex gap-3 overflow-x-auto snap-x">
+                                <label class="w-16 h-24 shrink-0 border border-dashed border-border rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-bg">
+                                    <i data-lucide="plus" class="w-4 h-4 text-muted"></i><span class="text-[9px] text-muted">添置</span>
+                                    <input type="file" accept="image/*" class="hidden" @change="uploadBgToLibrary">
+                                </label>
+                                <div class="w-16 h-24 shrink-0 border rounded-md cursor-pointer flex items-center justify-center text-[10px] text-muted snap-center transition-all" :class="!settings.bgImage ? 'border-text bg-bg' : 'border-border bg-surface'" @click="setBg('')">无相</div>
+                                <div v-for="(bg, idx) in settings.bgLibrary" :key="idx" class="w-16 h-24 shrink-0 rounded-md bg-cover bg-center cursor-pointer relative group snap-center" :style="{ backgroundImage: `url(${bg})` }" :class="settings.bgImage === bg ? 'ring-2 ring-text ring-offset-1' : ''" @click="setBg(bg)">
+                                    <button @click.stop="removeBg(idx)" class="absolute -top-2 -right-2 w-5 h-5 bg-surface text-red-500 rounded-full shadow border border-border opacity-0 group-hover:opacity-100 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3"></i></button>
+                                </div>
+                            </div>
+                        </section>
 
                         <section><h3 class="text-[11px] font-semibold text-muted tracking-widest px-2 mb-2">排版</h3>
                             <div class="bg-surface border border-border rounded-xl overflow-hidden text-[13px]">
@@ -1133,6 +988,14 @@
                                 <div class="p-3.5 border-b border-border flex flex-col gap-2">
                                     <div class="flex justify-between"><span>头像圆角</span><span>{{ settings.avatarRadius }}%</span></div>
                                     <input type="range" v-model.number="settings.avatarRadius" min="0" max="50" class="w-full accent-text">
+                                </div>
+                                <div class="p-3.5 border-b border-border flex flex-col gap-2">
+                                    <div class="flex justify-between"><span>头像大小</span><span>{{ settings.avatarSize }}px</span></div>
+                                    <input type="range" v-model.number="settings.avatarSize" min="24" max="56" class="w-full accent-text">
+                                </div>
+                                <div class="p-3.5 border-b border-border flex flex-col gap-2">
+                                    <div class="flex justify-between"><span>气泡间距</span><span>{{ settings.bubbleGap }}px</span></div>
+                                    <input type="range" v-model.number="settings.bubbleGap" min="2" max="30" class="w-full accent-text">
                                 </div>
                                 <div class="flex items-center justify-between p-3.5 border-b border-border"><span>显露头像</span><button @click="settings.showAvatar = !settings.showAvatar" class="w-10 h-5 rounded-full relative transition-colors" :class="settings.showAvatar ? 'bg-text' : 'bg-border'"><div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.showAvatar ? 'translate-x-5' : 'translate-x-0'"></div></button></div>
                                 <div class="flex items-center justify-between p-3.5 border-b border-border"><span>显示昵称</span><button @click="settings.showNickname = !settings.showNickname" class="w-10 h-5 rounded-full relative transition-colors" :class="settings.showNickname ? 'bg-text' : 'bg-border'"><div class="absolute top-1 left-1 w-3 h-3 bg-surface rounded-full transition-transform" :class="settings.showNickname ? 'translate-x-5' : 'translate-x-0'"></div></button></div>
@@ -1169,6 +1032,39 @@
                                 <div class="flex items-center justify-between p-3.5"><span>后台消息通知</span><button @click="requestNotification" class="text-xs text-accent hover:underline">{{ settings.notificationPermission === 'granted' ? '已开启' : '请求权限' }}</button></div>
                             </div>
                         </section>
+
+                        <section><h3 class="text-[11px] font-semibold text-muted tracking-widest px-2 mb-2">数据管理</h3>
+                            <div class="bg-surface border border-border rounded-xl overflow-hidden">
+                                <div class="p-3.5 border-b border-border flex justify-between items-center">
+                                    <span class="text-[13px]">全量导出</span>
+                                    <button @click="exportAllData" class="text-xs bg-text text-surface px-4 py-1.5 rounded hover:opacity-80">导出全部</button>
+                                </div>
+                                <div class="p-3.5 border-b border-border flex justify-between items-center">
+                                    <span class="text-[13px]">导出聊天记录</span>
+                                    <button @click="exportChatOnly" class="text-xs bg-text text-surface px-4 py-1.5 rounded hover:opacity-80">导出</button>
+                                </div>
+                                <div class="p-3.5 border-b border-border flex justify-between items-center">
+                                    <span class="text-[13px]">导出语料库</span>
+                                    <button @click="exportFullLibrary" class="text-xs bg-text text-surface px-4 py-1.5 rounded hover:opacity-80">导出</button>
+                                </div>
+                                <div class="p-3.5 border-b border-border flex justify-between items-center">
+                                    <span class="text-[13px]">导出表情包</span>
+                                    <button @click="exportEmojiOnly" class="text-xs bg-text text-surface px-4 py-1.5 rounded hover:opacity-80">导出</button>
+                                </div>
+                                <div class="p-3.5 border-b border-border flex justify-between items-center">
+                                    <span class="text-[13px]">导出设置</span>
+                                    <button @click="exportSettingsOnly" class="text-xs bg-text text-surface px-4 py-1.5 rounded hover:opacity-80">导出</button>
+                                </div>
+                                <div class="p-3.5 flex justify-between items-center">
+                                    <span class="text-[13px]">导入全量数据</span>
+                                    <label class="text-xs bg-text text-surface px-4 py-1.5 rounded hover:opacity-80 cursor-pointer">
+                                        导入
+                                        <input type="file" accept=".json" class="hidden" @change="importAllData">
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+
                         <div class="mt-4"><button @click="clearChat" class="w-full text-left p-4 bg-surface border border-border rounded-xl text-red-500 font-light tracking-wider hover:bg-red-500/5 transition-colors flex justify-between items-center">焚毁旧梦 <i data-lucide="flame" class="w-4 h-4"></i></button></div>
                     </main>
                 </div>
@@ -1341,11 +1237,14 @@
                 const showEmojiSelector = ref(false);
                 const replyTarget = ref(null);
                 const activeMsgId = ref(null);
-                const menuPosition = ref({ top: '0px', left: '0px' });
+                const menuPosition = ref({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
                 const showTransferModal = ref(false);
                 const showRedpacketModal = ref(false);
                 const modalAmount = ref('');
                 const modalMessage = ref('');
+
+                const msgSelectMode = ref(false);
+                const selectedMessages = ref([]);
 
                 let activeTimer = null;
                 let replyTimer = null;
@@ -1358,6 +1257,8 @@
                     showAvatar: true,
                     showNickname: false,
                     avatarRadius: 50,
+                    avatarSize: 32,
+                    bubbleGap: 12,
                     autoReply: true,
                     activeMessage: false,
                     activeInterval: 10800,
@@ -1432,7 +1333,7 @@
                     if (saveTimer) clearTimeout(saveTimer);
                     saveTimer = setTimeout(async () => {
                         try {
-                            await localforage.setItem('liubai_v11_full', {
+                            await localforage.setItem('liubai_v12_full', {
                                 messages: messages.value,
                                 profiles,
                                 settings,
@@ -1597,7 +1498,7 @@
                     return '[消息]';
                 };
 
-                // ---- 撤回（双方都可以） ----
+                // ---- 撤回 ----
                 const recallMsg = (id) => {
                     const m = messages.value.find(x => x.id === id);
                     if (m && !m.isRevoked) {
@@ -1628,33 +1529,47 @@
                     closeMsgMenu();
                 };
 
-                // ---- 核心修复：点击消息弹出菜单 ----
-                const handleMsgClick = (msg, event) => {
+                // ---- 选择模式 ----
+                const toggleSelectMode = () => {
+                    msgSelectMode.value = !msgSelectMode.value;
+                    if (!msgSelectMode.value) {
+                        selectedMessages.value = [];
+                    }
+                };
+
+                const toggleSelectMsg = (id) => {
+                    if (!msgSelectMode.value) {
+                        msgSelectMode.value = true;
+                    }
+                    const idx = selectedMessages.value.indexOf(id);
+                    if (idx > -1) {
+                        selectedMessages.value.splice(idx, 1);
+                    } else {
+                        selectedMessages.value.push(id);
+                    }
+                };
+
+                const handleMsgClick = (msg, event, index) => {
                     if (msg.isRevoked) return;
-                    // 先关闭其他菜单
+                    if (msgSelectMode.value) {
+                        toggleSelectMsg(msg.id);
+                        return;
+                    }
                     closeMsgMenu();
-                    // 使用 nextTick 确保 DOM 更新
                     nextTick(() => {
                         activeMsgId.value = msg.id;
                         const rect = event.currentTarget.getBoundingClientRect();
                         const isMe = msg.sender === 'me';
-                        // 计算菜单位置
-                        let left = isMe ? (rect.right - 160) : (rect.left + 10);
+                        let left = isMe ? (rect.right - 200) : (rect.left + 10);
                         let top = rect.top - 10;
-                        // 确保不超出屏幕
-                        const popupWidth = 160;
-                        const popupHeight = 160;
-                        if (left + popupWidth > window.innerWidth - 16) {
-                            left = window.innerWidth - popupWidth - 16;
-                        }
                         if (left < 16) left = 16;
-                        if (top + popupHeight > window.innerHeight - 16) {
-                            top = rect.top - popupHeight - 10;
-                        }
+                        if (left + 200 > window.innerWidth - 16) left = window.innerWidth - 216;
+                        if (top + 200 > window.innerHeight - 16) top = rect.top - 200;
                         if (top < 16) top = 16;
                         menuPosition.value = {
                             top: top + 'px',
-                            left: left + 'px'
+                            left: left + 'px',
+                            transform: 'none'
                         };
                     });
                 };
@@ -1663,6 +1578,102 @@
                     activeMsgId.value = null;
                 };
 
+                // ---- 导出功能 ----
+                const downloadJSON = (data, filename) => {
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                };
+
+                const exportAllData = () => {
+                    const data = {
+                        version: '1.0',
+                        exportDate: new Date().toISOString(),
+                        messages: messages.value,
+                        profiles: profiles,
+                        settings: settings,
+                        replyGroups: replyGroups.value,
+                        emojiLib: emojiLib.value
+                    };
+                    downloadJSON(data, `留白_全量数据_${Date.now()}.json`);
+                    showToast('全量数据导出成功');
+                };
+
+                const exportChatOnly = () => {
+                    const data = {
+                        exportDate: new Date().toISOString(),
+                        messages: messages.value,
+                        profiles: {
+                            me: profiles.me,
+                            them: profiles.them
+                        }
+                    };
+                    downloadJSON(data, `留白_聊天记录_${Date.now()}.json`);
+                    showToast('聊天记录导出成功');
+                };
+
+                const exportSelectedChats = () => {
+                    if (selectedMessages.value.length === 0) {
+                        showToast('请先选择消息');
+                        return;
+                    }
+                    const selected = messages.value.filter(m => selectedMessages.value.includes(m.id));
+                    const data = {
+                        exportDate: new Date().toISOString(),
+                        count: selected.length,
+                        messages: selected,
+                        profiles: {
+                            me: profiles.me,
+                            them: profiles.them
+                        }
+                    };
+                    downloadJSON(data, `留白_选中消息_${Date.now()}.json`);
+                    showToast(`导出 ${selected.length} 条消息成功`);
+                    toggleSelectMode();
+                };
+
+                const exportEmojiOnly = () => {
+                    downloadJSON(emojiLib.value, `留白_表情包_${Date.now()}.json`);
+                    showToast('表情包导出成功');
+                };
+
+                const exportSettingsOnly = () => {
+                    const data = {
+                        exportDate: new Date().toISOString(),
+                        settings: settings,
+                        profiles: profiles
+                    };
+                    downloadJSON(data, `留白_设置_${Date.now()}.json`);
+                    showToast('设置导出成功');
+                };
+
+                const importAllData = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        try {
+                            const data = JSON.parse(ev.target.result);
+                            if (data.messages) messages.value = data.messages;
+                            if (data.profiles) Object.assign(profiles, data.profiles);
+                            if (data.settings) Object.assign(settings, data.settings);
+                            if (data.replyGroups) replyGroups.value = data.replyGroups;
+                            if (data.emojiLib) emojiLib.value = data.emojiLib;
+                            showToast('数据导入成功！');
+                            debouncedSave();
+                            updateUnread();
+                        } catch (err) {
+                            showToast('文件格式错误: ' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                    e.target.value = '';
+                };
+
+                // ---- 输入菜单 ----
                 const toggleInputMenu = () => {
                     showInputMenu.value = !showInputMenu.value;
                     showEmojiSelector.value = false;
@@ -1984,16 +1995,12 @@
                     }
                 };
 
-                // ---- 全量导入导出 ----
+                // ---- 全量导入导出（语料库专用） ----
                 const exportFullLibrary = () => {
                     const data = { replyGroups: replyGroups.value, emojiLib: emojiLib.value,
                         exportDate: new Date().toISOString() };
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `留白全库_${Date.now()}.json`;
-                    a.click();
-                    showToast('导出成功');
+                    downloadJSON(data, `留白_语料库_${Date.now()}.json`);
+                    showToast('语料库导出成功');
                 };
                 const importFullLibrary = (e) => {
                     const file = e.target.files[0];
@@ -2253,7 +2260,7 @@
                 // ---- 生命周期 ----
                 onMounted(async () => {
                     try {
-                        const stored = await localforage.getItem('liubai_v11_full');
+                        const stored = await localforage.getItem('liubai_v12_full');
                         if (stored) {
                             if (stored.messages) messages.value = stored.messages;
                             if (stored.profiles) Object.assign(profiles, stored.profiles);
@@ -2325,6 +2332,7 @@
                     chatState, statData, toastMessage, toastVisible,
                     groupCollapsed, allGroupsExpanded,
                     presetEmojis,
+                    msgSelectMode, selectedMessages,
                     switchView,
                     sendMsg, sendMessage,
                     forceReply, deleteMsg,
@@ -2351,6 +2359,8 @@
                     openTransfer, openRedpacket, closeModal, confirmModal,
                     claimTransfer, claimRedpacket,
                     handleMsgClick, closeMsgMenu, recallMsg, replyToMsg, copyMsg, getReplyPreview,
+                    toggleSelectMode, toggleSelectMsg, exportSelectedChats,
+                    exportAllData, exportChatOnly, exportEmojiOnly, exportSettingsOnly, importAllData,
                     formatTimeDisplay,
                     showToast
                 };
